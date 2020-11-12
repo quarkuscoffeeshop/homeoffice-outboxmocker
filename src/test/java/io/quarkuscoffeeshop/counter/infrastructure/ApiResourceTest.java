@@ -12,10 +12,9 @@ public class ApiResourceTest {
     @Test
     public void testHelloEndpoint() {
         given()
-          .when().get("/api")
+          .when().get("/api/mock")
           .then()
-             .statusCode(200)
-             .body(is("hello"));
+             .statusCode(200);
     }
 
 }
