@@ -19,6 +19,7 @@ public class OrderTest {
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 UUID.randomUUID().toString(),
                 "WEB",
+                null,
                 new ArrayList<LineItem>() {{
                     add(new LineItem(Item.COFFEE_BLACK, "Paul"));
                 }},
@@ -30,6 +31,7 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(UUID.randomUUID().toString(),
                 "WEB",
+                null,
                 new ArrayList<LineItem>() {{
                     add(new LineItem(Item.COFFEE_BLACK, "Paul"));
                 }},

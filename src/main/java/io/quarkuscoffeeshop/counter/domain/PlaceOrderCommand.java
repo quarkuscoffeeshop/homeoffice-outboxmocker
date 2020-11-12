@@ -12,6 +12,8 @@ public class PlaceOrderCommand {
 
     private String orderSource;
 
+    private String loyaltyMemberId;
+
     private List<LineItem> baristaLineItems;
 
     private List<LineItem> kitchenLineItems;
@@ -21,9 +23,10 @@ public class PlaceOrderCommand {
     public PlaceOrderCommand() {
     }
 
-    public PlaceOrderCommand(String id, String orderSource, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {
+    public PlaceOrderCommand(String id, String orderSource, String loyaltyMemberId, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {
         this.id = id;
         this.orderSource = orderSource;
+        this.loyaltyMemberId = loyaltyMemberId;
         this.baristaLineItems = baristaLineItems;
         this.kitchenLineItems = kitchenLineItems;
         this.timestamp = Instant.now();
@@ -34,6 +37,7 @@ public class PlaceOrderCommand {
         return new StringJoiner(", ", PlaceOrderCommand.class.getSimpleName() + "[", "]")
                 .add("id='" + id + "'")
                 .add("orderSource='" + orderSource + "'")
+                .add("loyaltyMemberId='" + orderSource + "'")
                 .add("baristaLineItems=" + baristaLineItems)
                 .add("kitchenLineItems=" + kitchenLineItems)
                 .toString();
@@ -47,12 +51,13 @@ public class PlaceOrderCommand {
         return Objects.equals(id, that.id) &&
                 Objects.equals(orderSource, that.orderSource) &&
                 Objects.equals(baristaLineItems, that.baristaLineItems) &&
-                Objects.equals(kitchenLineItems, that.kitchenLineItems);
+                Objects.equals(kitchenLineItems, that.kitchenLineItems) &&
+                Objects.equals(loyaltyMemberId, that.loyaltyMemberId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, orderSource, baristaLineItems.size(), kitchenLineItems.size());
+        return Objects.hash(id, orderSource, loyaltyMemberId, baristaLineItems.size(), kitchenLineItems.size());
     }
 
     public Optional<List<LineItem>> getBaristaLineItems() {
@@ -61,6 +66,14 @@ public class PlaceOrderCommand {
 
     public Optional<List<LineItem>> getKitchenLineItems() {
         return Optional.ofNullable(kitchenLineItems);
+    }
+
+    public Optional<String> getLoyaltyMemberId() {
+        return Optional.ofNullable(loyaltyMemberId);
+    }
+
+    public void setLoyaltyMemberId(String loyaltyMemberId) {
+        this.loyaltyMemberId = loyaltyMemberId;
     }
 
     public String getId() {
@@ -85,6 +98,10 @@ public class PlaceOrderCommand {
 
     public void setKitchenLineItems(List<LineItem> kitchenLineItems) {
         this.kitchenLineItems = kitchenLineItems;
+    }
+
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
     }
 
     public Instant getTimestamp() {

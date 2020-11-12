@@ -10,26 +10,28 @@ import io.quarkuscoffeeshop.counter.domain.Order;
 
 import java.time.Instant;
 
-public class OrderCreatedEvent implements ExportedEvent<String, JsonNode> {
+public class LoyaltyMemberPurchaseEvent  implements ExportedEvent<String, JsonNode> {
 
     private static ObjectMapper mapper = new ObjectMapper();
 
     private static final String TYPE = "Order";
-    private static final String EVENT_TYPE = "OrderCreated";
+    private static final String EVENT_TYPE = "LoyaltyMemberPurchaseEvent";
 
+    private final String loyaltyMemberId;
     private final String orderId;
     private final JsonNode jsonNode;
     private final Instant timestamp;
 
-    private OrderCreatedEvent(String orderId, JsonNode jsonNode, Instant timestamp) {
+    private LoyaltyMemberPurchaseEvent(String loyaltyMemberId, String orderId, JsonNode jsonNode, Instant timestamp) {
+        this.loyaltyMemberId = loyaltyMemberId;
         this.orderId = orderId;
         this.jsonNode = jsonNode;
         this.timestamp = timestamp;
     }
 
-    public static OrderCreatedEvent of(final Order order) {
-
+    public static LoyaltyMemberPurchaseEvent of(final Order order){
         ObjectNode asJson = mapper.createObjectNode()
+                .put("loyaltyMemberId", order.getLoyaltyMemberId().get())
                 .put("orderId", order.getOrderId())
                 .put("orderSource", order.getOrderSource())
                 .put("timestamp", order.getTimestamp().toString());
@@ -54,7 +56,8 @@ public class OrderCreatedEvent implements ExportedEvent<String, JsonNode> {
             }
         }
 
-        return new OrderCreatedEvent(
+        return new LoyaltyMemberPurchaseEvent(
+                order.getLoyaltyMemberId().get(),
                 order.getOrderId(),
                 asJson,
                 order.getTimestamp());
@@ -84,4 +87,5 @@ public class OrderCreatedEvent implements ExportedEvent<String, JsonNode> {
     public Instant getTimestamp() {
         return timestamp;
     }
+
 }

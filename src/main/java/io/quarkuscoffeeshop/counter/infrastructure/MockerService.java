@@ -10,10 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @QuarkusMain
@@ -33,11 +30,16 @@ public class MockerService implements QuarkusApplication {
         while (running) {
             try {
                 Thread.sleep(3000);
-                int orders = new Random().nextInt(9);
-                if (orders %2 > 1) {
+                int orders = new Random().nextInt(33);
+                String loyaltyMemberId = null;
+                if(orders %3 == 0){
+                    loyaltyMemberId = UUID.randomUUID().toString();
+                }
+                if (orders %2 == 0) {
                     PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                             UUID.randomUUID().toString(),
                             "WEB",
+                            loyaltyMemberId,
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.COFFEE_BLACK, "Paul"));
                             }},
@@ -47,6 +49,7 @@ public class MockerService implements QuarkusApplication {
                 }else{
                     PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(UUID.randomUUID().toString(),
                             "WEB",
+                            loyaltyMemberId,
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.COFFEE_BLACK, "Paul"));
                             }},

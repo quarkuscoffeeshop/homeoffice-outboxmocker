@@ -1,8 +1,6 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
-import io.quarkuscoffeeshop.counter.domain.Item;
-import io.quarkuscoffeeshop.counter.domain.Receipt;
-import io.quarkuscoffeeshop.counter.domain.ReceiptLineItem;
+import io.quarkuscoffeeshop.counter.domain.*;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
@@ -19,37 +17,46 @@ public class ApiResource {
 
     @GET
     @Path("/mock")
-    public Receipt getMockReceipt() {
+    public Order getMockOrder() {
 
-        return mockReceipt();
+        return mockOrder();
     }
 
     @GET
     @Path("/{id}")
-    public Receipt findReceiptById(@PathParam("id") String id) {
+    public Order findOrderById(@PathParam("id") String id) {
 
-        return Receipt.findById(id);
+        return Order.findById(id);
     }
 
     @POST
     @Transactional
-    public Receipt createReceipt(Receipt receipt) {
-        receipt.persist();
-        return receipt;
+    public Order createOrder(final Order orderToPersist) {
+        Order order = new Order();
+        order.setOrderId(orderToPersist.getOrderId());
+        order.setOrderSource(orderToPersist.getOrderSource());
+        order.setTimestamp(orderToPersist.getTimestamp());
+        if(orderToPersist.getBaristaLineItems().isPresent()){
+            order.setBaristaLineItems(orderToPersist.getBaristaLineItems().get());
+        }
+        if (orderToPersist.getKitchenLineItems().isPresent()) {
+            order.setKitchenLineItems(orderToPersist.getKitchenLineItems().get());
+        }
+        order.persist();
+        return order;
     }
 
-    private Receipt mockReceipt() {
+    private Order mockOrder() {
 
-        Receipt receipt = new Receipt();
-        receipt.setOrderId(UUID.randomUUID().toString());
-        receipt.setTotal(BigDecimal.valueOf(3.50));
-        receipt.setLineItems(mockBaristaItems(receipt));
-        return receipt;
+        Order order = new Order();
+        order.setOrderId(UUID.randomUUID().toString());
+        order.setBaristaLineItems(mockBaristaItems(order));
+        return order;
     }
 
-    private List<ReceiptLineItem> mockBaristaItems(Receipt receipt) {
+    private List<LineItem> mockBaristaItems(Order order) {
         return new ArrayList<>(){{
-            add(new ReceiptLineItem(receipt, Item.ESPRESSO, "Lemmy"));
+            add(new LineItem(Item.ESPRESSO, "Lemmy", order));
         }};
     }
 

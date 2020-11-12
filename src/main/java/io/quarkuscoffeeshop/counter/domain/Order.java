@@ -1,6 +1,7 @@
 package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkuscoffeeshop.counter.domain.events.LoyaltyMemberPurchaseEvent;
 import io.quarkuscoffeeshop.counter.domain.events.OrderCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ public class Order extends PanacheEntityBase {
     private String orderId;
 
     private String orderSource;
+
+    private String loyaltyMemberId;
 
     private Instant timestamp;
 
@@ -59,11 +62,12 @@ public class Order extends PanacheEntityBase {
         orderEvent.setOrder(order);
         orderEvent.addEvent(OrderCreatedEvent.of(order));
 
-/*
-        if (placeOrderCommand.getRewardsId().isPresent()) {
-            order.rewardsId = placeOrderCommand.getRewardsId().get();
+        // if this order was places by a Loyalty Member add the appropriate event
+        if (placeOrderCommand.getLoyaltyMemberId().isPresent()) {
+            order.setLoyaltyMemberId(placeOrderCommand.getLoyaltyMemberId().get());
+            orderEvent.addEvent(LoyaltyMemberPurchaseEvent.of(order));
         }
-*/
+
         return orderEvent;
     }
 
@@ -95,6 +99,14 @@ public class Order extends PanacheEntityBase {
 
     public Optional<List<LineItem>> getKitchenLineItems() {
         return Optional.ofNullable(kitchenLineItems);
+    }
+
+    public Optional<String> getLoyaltyMemberId() {
+        return Optional.ofNullable(this.loyaltyMemberId);
+    }
+
+    public void setLoyaltyMemberId(String loyaltyMemberId) {
+        this.loyaltyMemberId = loyaltyMemberId;
     }
 
     public String getOrderId() {
