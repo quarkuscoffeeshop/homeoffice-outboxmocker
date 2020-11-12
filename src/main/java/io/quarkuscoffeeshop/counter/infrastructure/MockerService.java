@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,6 +20,9 @@ import java.util.concurrent.CompletableFuture;
 public class MockerService implements QuarkusApplication {
 
     final Logger logger = LoggerFactory.getLogger(MockerService.class);
+
+    @Inject
+    OrderService orderService;
 
     private boolean running = true;
 
@@ -38,7 +43,7 @@ public class MockerService implements QuarkusApplication {
                             }},
                             null);
                     OrderEvent orderEvent = Order.process(placeOrderCommand);
-                    orderEvent.getOrder().persist();
+                    orderService.onPlaceOrderCommand(placeOrderCommand);
                 }else{
                     PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(UUID.randomUUID().toString(),
                             "WEB",
@@ -48,6 +53,8 @@ public class MockerService implements QuarkusApplication {
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.CAKEPOP, "John"));
                             }});
+                    OrderEvent orderEvent = Order.process(placeOrderCommand);
+                    orderService.onPlaceOrderCommand(placeOrderCommand);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

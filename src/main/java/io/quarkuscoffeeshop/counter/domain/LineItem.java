@@ -11,6 +11,7 @@ import java.util.StringJoiner;
 @Table(name="LineItems")
 public class LineItem extends PanacheEntity {
 
+    @Enumerated(EnumType.STRING)
     private Item item;
 
     private String name;
