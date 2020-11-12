@@ -7,13 +7,13 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-@Entity
-@Table(name="LineItems")
+//@Entity
+//@Table(name="LineItems")
 public class ReceiptLineItem extends PanacheEntity {
 
-    @JsonbTransient
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="orderId",nullable = false)
+//    @JsonbTransient
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name="orderId",nullable = false)
     private Receipt receipt;
 
     private Item item;

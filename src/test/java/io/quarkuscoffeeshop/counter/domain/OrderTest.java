@@ -16,7 +16,8 @@ public class OrderTest {
 
     @Test
     public void testProcessPlaceOrderCommandWithSingleBaristaItem() {
-        PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(UUID.randomUUID().toString(),
+        PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
+                UUID.randomUUID().toString(),
                 "WEB",
                 new ArrayList<LineItem>() {{
                     add(new LineItem(Item.COFFEE_BLACK, "Paul"));

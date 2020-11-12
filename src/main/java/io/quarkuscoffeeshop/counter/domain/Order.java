@@ -1,27 +1,34 @@
 package io.quarkuscoffeeshop.counter.domain;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkuscoffeeshop.counter.domain.events.OrderCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class Order {
+@Entity @Table(name = "Orders")
+public class Order extends PanacheEntityBase {
 
+    @Transient
     static Logger logger = LoggerFactory.getLogger(Order.class);
 
+    @Id
+    @Column(nullable = false, name = "orderId")
     private String orderId;
 
     private String orderSource;
 
     private Instant timestamp;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", cascade = CascadeType.ALL)
     private List<LineItem> baristaLineItems;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", cascade = CascadeType.ALL)
     private List<LineItem> kitchenLineItems;
 
     public static OrderEvent process(final PlaceOrderCommand placeOrderCommand){
@@ -38,14 +45,14 @@ public class Order {
             logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaLineItems().get().size());
             placeOrderCommand.getBaristaLineItems().get().forEach(v -> {
                 logger.debug("createOrderFromCommand adding baristaItem from {}", v.toString());
-                order.addBaristaLineItem(new LineItem(v.getItem(), v.getName()));
+                order.addBaristaLineItem(new LineItem(v.getItem(), v.getName(), order));
             });
         }
         if (placeOrderCommand.getKitchenLineItems().isPresent()) {
             logger.debug("createOrderFromCommand adding kitchenOrders {}", placeOrderCommand.getKitchenLineItems().get().size());
             placeOrderCommand.getKitchenLineItems().get().forEach(v ->{
                 logger.debug("createOrderFromCommand adding kitchenItem from {}", v.toString());
-                order.addKitchenLineItem(new LineItem(v.getItem(), v.getName()));
+                order.addKitchenLineItem(new LineItem(v.getItem(), v.getName(), order));
             });
         }
 

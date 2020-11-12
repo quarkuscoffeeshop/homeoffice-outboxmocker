@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-@Entity
+//@Entity
 public class Receipt extends PanacheEntityBase {
 
-    @Id
-    @Column(nullable = false, name = "orderId")
+//    @Id
+//    @Column(nullable = false, name = "orderId")
     private String orderId;
 
     private BigDecimal total;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "receipt", cascade = CascadeType.ALL)
+//    @OneToMany(fetch = FetchType.EAGER, mappedBy = "receipt", cascade = CascadeType.ALL)
     private List<ReceiptLineItem> lineItems;
 
     public Receipt() {
