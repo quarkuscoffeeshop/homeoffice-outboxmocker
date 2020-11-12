@@ -1,5 +1,7 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
 import io.quarkuscoffeeshop.counter.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +14,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@ApplicationScoped
-public class MockerService {
+@QuarkusMain
+public class MockerService implements QuarkusApplication {
 
     final Logger logger = LoggerFactory.getLogger(MockerService.class);
 
@@ -21,7 +23,7 @@ public class MockerService {
 
     private Runnable mockOrders = () -> {
 
-        logger.debug("CustomerMocker now running");
+        logger.debug("Mocker now running");
 
         while (running) {
             try {
@@ -53,11 +55,11 @@ public class MockerService {
         }
     };
 
-    @PostConstruct
-    public void start() {
+    @Override
+    public int run(String... args) throws Exception {
         this.running = true;
+        logger.info("starting");
         mockOrders.run();
+        return 10;
     }
-
-
 }
