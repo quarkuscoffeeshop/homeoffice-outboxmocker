@@ -31,4 +31,9 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 
 You can then execute your native executable with: `./target/outboxmocker-1.0-SNAPSHOT-runner`
 
+To build a Docker container: 
+```shell script
+docker build -f src/main/docker/Dockerfile.native -t <<DOCKEHUB NAME>>/quarkuscoffeeshop-outboxmocker .
+```
+
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/building-native-image.

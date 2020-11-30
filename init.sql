@@ -1,7 +1,7 @@
     DROP SCHEMA IF EXISTS coffeeshop;
     CREATE SCHEMA coffeeshop;
     alter table if exists coffeeshop.LineItems
-     drop constraint if exists FKbd50qos3gul5b1t3h6yito6es;
+    drop constraint if exists FKbd50qos3gul5b1t3h6yito6es;
     drop table if exists coffeeshop.LineItems cascade;
     drop table if exists coffeeshop.Orders cascade;
     drop table if exists coffeeshop.OutboxEvent cascade;
