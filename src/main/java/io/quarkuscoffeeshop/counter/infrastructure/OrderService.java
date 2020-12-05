@@ -2,7 +2,7 @@ package io.quarkuscoffeeshop.counter.infrastructure;
 
 import io.debezium.outbox.quarkus.ExportedEvent;
 import io.quarkuscoffeeshop.counter.domain.Order;
-import io.quarkuscoffeeshop.counter.domain.OrderEventResult;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;

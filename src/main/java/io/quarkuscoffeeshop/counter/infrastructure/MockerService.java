@@ -4,6 +4,7 @@ import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import io.quarkuscoffeeshop.counter.domain.*;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

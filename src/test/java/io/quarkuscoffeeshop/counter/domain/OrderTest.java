@@ -1,6 +1,7 @@
 package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -31,9 +32,9 @@ public class OrderTest {
   @Test
   public void testProcessPlaceOrderCommandWithSingleBaristaItemAndSingleKitchenItem() {
 
-    PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(UUID.randomUUID().toString(),
+    PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
       OrderSource.WEB,
-      Location.CHARLOTTE
+      Location.CHARLOTTE,
       null,
       new ArrayList<LineItem>() {{
         add(new LineItem(Item.COFFEE_BLACK, "Paul"));
@@ -59,9 +60,7 @@ public class OrderTest {
 
     String orderId = UUID.randomUUID().toString();
     Order order = new Order();
-    order.setOrderId(orderId);
     LineItem lineItem = new LineItem(Item.COFFEE_BLACK, "Lemmy", order);
-    lineItem.setId(UUID.randomUUID().toString());
     order.addBaristaLineItem(lineItem);
 
     OrderTicket orderTicket = new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName());

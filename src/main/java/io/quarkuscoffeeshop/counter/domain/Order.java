@@ -1,18 +1,21 @@
 package io.quarkuscoffeeshop.counter.domain;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.events.LoyaltyMemberPurchaseEvent;
 import io.quarkuscoffeeshop.counter.domain.events.OrderCreatedEvent;
 import io.quarkuscoffeeshop.counter.domain.events.OrderUpdatedEvent;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import javax.sound.sampled.Line;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "Orders")
@@ -40,10 +43,36 @@ public class Order extends PanacheEntityBase {
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", cascade = CascadeType.ALL)
   private List<LineItem> kitchenLineItems;
 
+  /**
+   * Updates the lineItem corresponding to the ticket, creates the appropriate domain events,
+   * creates value objects to notify the system, checks the order to see if all items are completed,
+   * and updates the order if necessary
+   *
+   * All corresponding objects are returned in an OrderEventResult
+   *
+   * @param orderTicket
+   * @return OrderEventResult
+   */
   public OrderEventResult applyOrderTicketUp(final OrderTicket orderTicket) {
 
+    // set the LineItem's new status
     markFulfilled(orderTicket.getOrderId());
+
+    // create the domain event
     OrderUpdatedEvent orderUpdatedEvent = OrderUpdatedEvent.of(this);
+
+    // create the update value object
+    OrderUpdate orderUpdate = new OrderUpdate(orderTicket.getOrderId(), orderTicket.getLineItemId(), OrderStatus.FULFILLED);
+
+    // check the status of the Order itself and update if necessary
+    if(Stream.concat(this.baristaLineItems.stream(), this.kitchenLineItems.stream())
+      .allMatch(lineItem -> {
+        return lineItem.getLineItemStatus().equals(LineItemStatus.FULFILLED);
+      })){
+      this.orderStatus = OrderStatus.FULFILLED;
+    };
+
+    // return the results
     OrderEventResult orderEventResult = new OrderEventResult();
     orderEventResult.setOrder(this);
     orderEventResult.addEvent(orderUpdatedEvent);
@@ -87,14 +116,18 @@ public class Order extends PanacheEntityBase {
       logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaLineItems().get().size());
       placeOrderCommand.getBaristaLineItems().get().forEach(v -> {
         logger.debug("createOrderFromCommand adding baristaItem from {}", v.toString());
-        order.addBaristaLineItem(new LineItem(v.getItem(), v.getName(), order));
+        LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);
+        order.addBaristaLineItem(lineItem);
+        orderEventResult.addBaristaTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
       });
     }
     if (placeOrderCommand.getKitchenLineItems().isPresent()) {
       logger.debug("createOrderFromCommand adding kitchenOrders {}", placeOrderCommand.getKitchenLineItems().get().size());
       placeOrderCommand.getKitchenLineItems().get().forEach(v -> {
         logger.debug("createOrderFromCommand adding kitchenItem from {}", v.toString());
-        order.addKitchenLineItem(new LineItem(v.getItem(), v.getName(), order));
+        LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);
+        order.addKitchenLineItem(lineItem);
+        orderEventResult.addKitchenTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
       });
     }
 
