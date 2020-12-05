@@ -1,5 +1,7 @@
 package io.quarkuscoffeeshop.counter.domain;
 
+import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,43 +14,66 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class OrderTest {
 
-    Logger logger = LoggerFactory.getLogger(OrderTest.class);
+  Logger logger = LoggerFactory.getLogger(OrderTest.class);
 
-    @Test
-    public void testProcessPlaceOrderCommandWithSingleBaristaItem() {
-        PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
-                UUID.randomUUID().toString(),
-                "WEB",
-                null,
-                new ArrayList<LineItem>() {{
-                    add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-                }},
-                null);
-    }
+  @Test
+  public void testProcessPlaceOrderCommandWithSingleBaristaItem() {
+    PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
+      OrderSource.WEB,
+      Location.ATLANTA,
+      null,
+      new ArrayList<LineItem>() {{
+        add(new LineItem(Item.COFFEE_BLACK, "Paul"));
+      }},
+      null);
+  }
 
-    @Test
-    public void testProcessPlaceOrderCommandWithSingleBaristaItemAndSingleKitchenItem() {
+  @Test
+  public void testProcessPlaceOrderCommandWithSingleBaristaItemAndSingleKitchenItem() {
 
-        PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(UUID.randomUUID().toString(),
-                "WEB",
-                null,
-                new ArrayList<LineItem>() {{
-                    add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-                }},
-                new ArrayList<LineItem>() {{
-                    add(new LineItem(Item.CAKEPOP, "John"));
-                }});
+    PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(UUID.randomUUID().toString(),
+      OrderSource.WEB,
+      Location.CHARLOTTE
+      null,
+      new ArrayList<LineItem>() {{
+        add(new LineItem(Item.COFFEE_BLACK, "Paul"));
+      }},
+      new ArrayList<LineItem>() {{
+        add(new LineItem(Item.CAKEPOP, "John"));
+      }});
 
-        OrderEvent result = Order.process(placeOrderCommand);
-        System.out.println(result.toString());
-        assertNotNull(result);
-        assertNotNull(result.getOrder());
-        assertNotNull(result.getEvents());
-        result.getEvents().forEach(exportedEvent -> {
-            System.out.println(exportedEvent.getPayload());
-        });
-        assertEquals(1, result.getEvents().size());
-        assertEquals(placeOrderCommand.getId(), result.getOrder().getOrderId());
-    }
+    OrderEventResult result = Order.process(placeOrderCommand);
+    System.out.println(result.toString());
+    assertNotNull(result);
+    assertNotNull(result.getOrder());
+    assertNotNull(result.getOutboxEvents());
+    result.getOutboxEvents().forEach(exportedEvent -> {
+      System.out.println(exportedEvent.getPayload());
+    });
+    assertEquals(1, result.getOutboxEvents().size());
+    assertEquals(placeOrderCommand.getId(), result.getOrder().getOrderId());
+  }
+
+  @Test
+  public void testUpdateOrderAfterOrderUpdatedEvent() {
+
+    String orderId = UUID.randomUUID().toString();
+    Order order = new Order();
+    order.setOrderId(orderId);
+    LineItem lineItem = new LineItem(Item.COFFEE_BLACK, "Lemmy", order);
+    lineItem.setId(UUID.randomUUID().toString());
+    order.addBaristaLineItem(lineItem);
+
+    OrderTicket orderTicket = new OrderTicket(order.getOrderId(), lineItem.getId(), lineItem.getItem(), lineItem.getName());
+
+    OrderEventResult orderEventResult = order.applyOrderTicketUp(orderTicket);
+    assertNotNull(orderEventResult);
+    assertNotNull(orderEventResult.getOrder());
+    assertNotNull(orderEventResult.getOutboxEvents());
+    assertEquals(1, orderEventResult.getOutboxEvents().size());
+    assertEquals(orderId, orderEventResult.getOrder().getOrderId());
+    assertEquals(LineItemStatus.FULFILLED, orderEventResult.getOrder().getBaristaLineItems().get().get(0).getLineItemStatus());
+
+  }
 
 }

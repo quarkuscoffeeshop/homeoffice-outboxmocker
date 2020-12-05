@@ -31,7 +31,7 @@ public class OrderCreatedEvent implements ExportedEvent<String, JsonNode> {
 
         ObjectNode asJson = mapper.createObjectNode()
                 .put("orderId", order.getOrderId())
-                .put("orderSource", order.getOrderSource())
+                .put("orderSource", order.getOrderSource().toString())
                 .put("timestamp", order.getTimestamp().toString());
 
         if (order.getBaristaLineItems().isPresent()) {

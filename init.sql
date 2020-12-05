@@ -8,7 +8,7 @@
     drop sequence if exists coffeeshop.hibernate_sequence;
     create sequence coffeeshop.hibernate_sequence start 1 increment 1;
     create table coffeeshop.LineItems (
-       id int8 not null,
+        id varchar(255) not null,
         item varchar(255),
         name varchar(255),
         orderId varchar(255) not null,

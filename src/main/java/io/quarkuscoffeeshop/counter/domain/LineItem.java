@@ -2,81 +2,99 @@ package io.quarkuscoffeeshop.counter.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import javax.persistence.*;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
-@Table(name="LineItems")
-public class LineItem extends PanacheEntity {
+@Table(name = "LineItems")
+public class LineItem extends PanacheEntityBase {
 
-    @Enumerated(EnumType.STRING)
-    private Item item;
+  @JsonIgnore
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "orderId", nullable = false)
+  Order order;
 
-    private String name;
+  @Id
+  @GeneratedValue(strategy="org.hibernate.id.Assigned")
+  @Column(nullable = false, name = "id")
+  private final String id;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="orderId",nullable = false)
-    Order order;
+  @Enumerated(EnumType.STRING)
+  private Item item;
 
-    public LineItem() {
-    }
+  private String name;
 
-    public LineItem(Item item, String name) {
-        this.item = item;
-        this.name = name;
-    }
+  private BigDecimal price;
 
-    public LineItem(Item item, String name, Order order) {
-        this.item = item;
-        this.name = name;
-        this.order = order;
-    }
+  @Enumerated(EnumType.STRING)
+  private LineItemStatus lineItemStatus;
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", LineItem.class.getSimpleName() + "[", "]")
-                .add("item=" + item)
-                .add("name='" + name + "'")
-                .add("orderId='" + order.getOrderId() +"'")
-                .toString();
-    }
+  public LineItem() {
+    this.id = UUID.randomUUID().toString();
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  public LineItem(Item item, String name) {
+    this.id = UUID.randomUUID().toString();
+    this.item = item;
+    this.name = name;
+  }
 
-        LineItem lineItem = (LineItem) o;
+  public LineItem(Item item, String name, Order order) {
+    this.id = UUID.randomUUID().toString();
+    this.item = item;
+    this.name = name;
+    this.lineItemStatus = LineItemStatus.PLACED;
+    this.order = order;
+  }
 
-        if (item != lineItem.item) return false;
-        if (name != null ? !name.equals(lineItem.name) : lineItem.name != null) return false;
-        return order != null ? order.equals(lineItem.order) : lineItem.order == null;
-    }
+  public LineItem(Item item, String name, LineItemStatus lineItemStatus, Order order) {
+    this.id = UUID.randomUUID().toString();
+    this.item = item;
+    this.name = name;
+    this.lineItemStatus = lineItemStatus;
+    this.order = order;
+  }
 
-    @Override
-    public int hashCode() {
-        int result = item != null ? item.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (order != null ? order.hashCode() : 0);
-        return result;
-    }
+  public BigDecimal getPrice() {
+    return this.item.getPrice();
+  }
 
-    public Item getItem() {
-        return item;
-    }
+  public Item getItem() {
+    return item;
+  }
 
-    public void setItem(Item item) {
-        this.item = item;
-    }
+  public void setItem(Item item) {
+    this.item = item;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public LineItemStatus getLineItemStatus() {
+    return lineItemStatus;
+  }
+
+  public void setLineItemStatus(LineItemStatus lineItemStatus) {
+    this.lineItemStatus = lineItemStatus;
+  }
+
+  public Order getOrder() {
+    return order;
+  }
+
+  public void setOrder(Order order) {
+    this.order = order;
+  }
+
+  public String getId() {
+    return this.id;
+  }
 }

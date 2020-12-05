@@ -3,15 +3,12 @@ package io.quarkuscoffeeshop.counter.infrastructure;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import io.quarkuscoffeeshop.counter.domain.*;
+import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 @QuarkusMain
 public class MockerService implements QuarkusApplication {
@@ -37,18 +34,19 @@ public class MockerService implements QuarkusApplication {
                 }
                 if (orders %2 == 0) {
                     PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
-                            UUID.randomUUID().toString(),
-                            "WEB",
+                            OrderSource.COUNTER,
+                            Location.ATLANTA,
                             loyaltyMemberId,
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.COFFEE_BLACK, "Paul"));
                             }},
                             null);
-                    OrderEvent orderEvent = Order.process(placeOrderCommand);
+                    OrderEventResult orderEventResult = Order.process(placeOrderCommand);
                     orderService.onPlaceOrderCommand(placeOrderCommand);
                 }else{
-                    PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(UUID.randomUUID().toString(),
-                            "WEB",
+                    PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
+                            OrderSource.WEB,
+                            Location.CHARLOTTE,
                             loyaltyMemberId,
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.COFFEE_BLACK, "Paul"));
@@ -56,7 +54,7 @@ public class MockerService implements QuarkusApplication {
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.CAKEPOP, "John"));
                             }});
-                    OrderEvent orderEvent = Order.process(placeOrderCommand);
+                    OrderEventResult orderEventResult = Order.process(placeOrderCommand);
                     orderService.onPlaceOrderCommand(placeOrderCommand);
                 }
             } catch (InterruptedException e) {
