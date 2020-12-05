@@ -3,6 +3,7 @@ package io.quarkuscoffeeshop.counter.infrastructure;
 import io.quarkuscoffeeshop.counter.domain.*;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,6 @@ public class JsonResource {
   public Response placeOrderCommand() {
 
     Order order = new Order();
-    order.setOrderId(UUID.randomUUID().toString());
 
     return Response.ok(new PlaceOrderCommand(
       OrderSource.WEB,
@@ -60,4 +60,18 @@ public class JsonResource {
 
     return Response.ok(orderTicket).build();
   }
+
+  @GET
+  @Path("/OrderUpdate")
+  public Response getOrderUpdate() {
+
+    OrderUpdate orderUpdate = new OrderUpdate(
+      UUID.randomUUID().toString(),
+      UUID.randomUUID().toString(),
+      OrderStatus.FULFILLED
+    );
+
+    return Response.ok().entity(orderUpdate).build();
+  }
+
 }

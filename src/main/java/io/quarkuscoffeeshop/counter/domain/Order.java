@@ -1,5 +1,6 @@
 package io.quarkuscoffeeshop.counter.domain;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.events.LoyaltyMemberPurchaseEvent;
@@ -21,8 +22,7 @@ public class Order extends PanacheEntityBase {
   static Logger logger = LoggerFactory.getLogger(Order.class);
 
   @Id
-  @GeneratedValue(strategy="org.hibernate.id.Assigned")
-  @Column(nullable = false, name = "orderId")
+  @Column(nullable = false, unique = true, name = "order_id")
   private String orderId;
 
   private OrderSource orderSource;
@@ -53,14 +53,14 @@ public class Order extends PanacheEntityBase {
   private void markFulfilled(final String orderId) {
     if (getBaristaLineItems().isPresent()) {
        getBaristaLineItems().get().stream().forEach(lineItem -> {
-         if(orderId.equals(lineItem.getId())){
+         if(orderId.equals(lineItem.getItemId())){
            lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
          }
        });
     }
     if (getKitchenLineItems().isPresent()) {
       getBaristaLineItems().get().stream().forEach(lineItem -> {
-        if(orderId.equals(lineItem.getId())){
+        if(orderId.equals(lineItem.getItemId())){
           lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
         }
       });
@@ -80,7 +80,6 @@ public class Order extends PanacheEntityBase {
 
     // build the order from the PlaceOrderCommand
     Order order = new Order();
-    order.setOrderId(placeOrderCommand.getId());
     order.setOrderSource(placeOrderCommand.getOrderSource());
     order.setTimestamp(placeOrderCommand.getTimestamp());
 
@@ -160,10 +159,11 @@ public class Order extends PanacheEntityBase {
   }
 
   public Order() {
+    this.orderId = UUID.randomUUID().toString();
   }
 
   public Order(String orderId, OrderSource orderSource, String loyaltyMemberId, Instant timestamp, OrderStatus orderStatus, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {
-    this.orderId = orderId;
+    this.orderId = UUID.randomUUID().toString();
     this.orderSource = orderSource;
     this.loyaltyMemberId = loyaltyMemberId;
     this.timestamp = timestamp;
@@ -218,10 +218,6 @@ public class Order extends PanacheEntityBase {
 
   public String getOrderId() {
     return orderId;
-  }
-
-  public void setOrderId(String orderId) {
-    this.orderId = orderId;
   }
 
   public OrderSource getOrderSource() {

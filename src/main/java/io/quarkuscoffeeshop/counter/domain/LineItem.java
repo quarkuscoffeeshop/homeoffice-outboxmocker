@@ -14,13 +14,12 @@ public class LineItem extends PanacheEntityBase {
 
   @JsonIgnore
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "orderId", nullable = false)
+  @JoinColumn(name = "order_id", nullable = false)
   Order order;
 
   @Id
-  @GeneratedValue(strategy="org.hibernate.id.Assigned")
-  @Column(nullable = false, name = "id")
-  private final String id;
+  @Column(nullable = false, unique = true)
+  private String itemId;
 
   @Enumerated(EnumType.STRING)
   private Item item;
@@ -33,17 +32,17 @@ public class LineItem extends PanacheEntityBase {
   private LineItemStatus lineItemStatus;
 
   public LineItem() {
-    this.id = UUID.randomUUID().toString();
+    this.itemId = UUID.randomUUID().toString();
   }
 
   public LineItem(Item item, String name) {
-    this.id = UUID.randomUUID().toString();
+    this.itemId = UUID.randomUUID().toString();
     this.item = item;
     this.name = name;
   }
 
   public LineItem(Item item, String name, Order order) {
-    this.id = UUID.randomUUID().toString();
+    this.itemId = UUID.randomUUID().toString();
     this.item = item;
     this.name = name;
     this.lineItemStatus = LineItemStatus.PLACED;
@@ -51,7 +50,7 @@ public class LineItem extends PanacheEntityBase {
   }
 
   public LineItem(Item item, String name, LineItemStatus lineItemStatus, Order order) {
-    this.id = UUID.randomUUID().toString();
+    this.itemId = UUID.randomUUID().toString();
     this.item = item;
     this.name = name;
     this.lineItemStatus = lineItemStatus;
@@ -94,7 +93,7 @@ public class LineItem extends PanacheEntityBase {
     this.order = order;
   }
 
-  public String getId() {
-    return this.id;
+  public String getItemId() {
+    return this.itemId;
   }
 }

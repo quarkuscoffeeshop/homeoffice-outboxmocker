@@ -64,7 +64,7 @@ public class OrderTest {
     lineItem.setId(UUID.randomUUID().toString());
     order.addBaristaLineItem(lineItem);
 
-    OrderTicket orderTicket = new OrderTicket(order.getOrderId(), lineItem.getId(), lineItem.getItem(), lineItem.getName());
+    OrderTicket orderTicket = new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName());
 
     OrderEventResult orderEventResult = order.applyOrderTicketUp(orderTicket);
     assertNotNull(orderEventResult);

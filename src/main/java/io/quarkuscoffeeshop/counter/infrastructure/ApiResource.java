@@ -32,7 +32,6 @@ public class ApiResource {
     @Transactional
     public Order createOrder(final Order orderToPersist) {
         Order order = new Order();
-        order.setOrderId(orderToPersist.getOrderId());
         order.setOrderSource(orderToPersist.getOrderSource());
         order.setTimestamp(orderToPersist.getTimestamp());
         if(orderToPersist.getBaristaLineItems().isPresent()){
@@ -48,7 +47,6 @@ public class ApiResource {
     private Order mockOrder() {
 
         Order order = new Order();
-        order.setOrderId(UUID.randomUUID().toString());
         order.setBaristaLineItems(mockBaristaItems(order));
         return order;
     }

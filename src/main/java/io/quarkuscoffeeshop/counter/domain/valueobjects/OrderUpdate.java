@@ -4,19 +4,23 @@ import io.quarkuscoffeeshop.counter.domain.OrderStatus;
 
 public class OrderUpdate {
 
-  private final String id;
+  private final String orderId;
+
+  private final String itemId;
 
   private final OrderStatus orderStatus;
 
-  public OrderUpdate(String id, OrderStatus orderStatus) {
-    this.id = id;
+  public OrderUpdate(final String orderId, final String itemId, final OrderStatus orderStatus) {
+    this.orderId = orderId;
+    this.itemId = itemId;
     this.orderStatus = orderStatus;
   }
 
   @Override
   public String toString() {
     return "OrderUpdate{" +
-      "id='" + id + '\'' +
+      "orderId='" + orderId + '\'' +
+      ", itemId='" + itemId + '\'' +
       ", orderStatus=" + orderStatus +
       '}';
   }
@@ -28,19 +32,25 @@ public class OrderUpdate {
 
     OrderUpdate that = (OrderUpdate) o;
 
-    if (id != null ? !id.equals(that.id) : that.id != null) return false;
-    return orderStatus == that.orderStatus;
+    if (orderId != null ? !orderId.equals(that.orderId) : that.orderId != null) return false;
+    if (itemId != null ? !itemId.equals(that.itemId) : that.itemId != null) return false;
+    return getOrderStatus() == that.getOrderStatus();
   }
 
   @Override
   public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
-    result = 31 * result + (orderStatus != null ? orderStatus.hashCode() : 0);
+    int result = orderId != null ? orderId.hashCode() : 0;
+    result = 31 * result + (itemId != null ? itemId.hashCode() : 0);
+    result = 31 * result + (getOrderStatus() != null ? getOrderStatus().hashCode() : 0);
     return result;
   }
 
-  public String getId() {
-    return id;
+  public String getOrderId() {
+    return orderId;
+  }
+
+  public String getItemId() {
+    return itemId;
   }
 
   public OrderStatus getOrderStatus() {
