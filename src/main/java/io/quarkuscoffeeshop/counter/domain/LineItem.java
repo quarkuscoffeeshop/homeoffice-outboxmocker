@@ -37,6 +37,7 @@ public class LineItem extends PanacheEntityBase {
 
   public LineItem(Item item, String name) {
     this.itemId = UUID.randomUUID().toString();
+    this.lineItemStatus = LineItemStatus.PLACED;
     this.item = item;
     this.name = name;
   }

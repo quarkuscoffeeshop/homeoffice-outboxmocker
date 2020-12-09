@@ -56,7 +56,7 @@ public class Order extends PanacheEntityBase {
   public OrderEventResult applyOrderTicketUp(final OrderTicket orderTicket) {
 
     // set the LineItem's new status
-    markFulfilled(orderTicket.getOrderId());
+    markFulfilled(orderTicket.getLineItemId());
 
     // create the domain event
     OrderUpdatedEvent orderUpdatedEvent = OrderUpdatedEvent.of(this);
@@ -64,13 +64,30 @@ public class Order extends PanacheEntityBase {
     // create the update value object
     OrderUpdate orderUpdate = new OrderUpdate(orderTicket.getOrderId(), orderTicket.getLineItemId(), OrderStatus.FULFILLED);
 
-    // check the status of the Order itself and update if necessary
-    if(Stream.concat(this.baristaLineItems.stream(), this.kitchenLineItems.stream())
-      .allMatch(lineItem -> {
-        return lineItem.getLineItemStatus().equals(LineItemStatus.FULFILLED);
-      })){
-      this.orderStatus = OrderStatus.FULFILLED;
-    };
+    // if there are both barista and kitchen items concatenate them before checking status
+    if (this.getBaristaLineItems().isPresent() && this.getKitchenLineItems().isPresent()) {
+      // check the status of the Order itself and update if necessary
+      if(Stream.concat(this.baristaLineItems.stream(), this.kitchenLineItems.stream())
+              .allMatch(lineItem -> {
+                return lineItem.getLineItemStatus().equals(LineItemStatus.FULFILLED);
+              })){
+        setOrderStatus(OrderStatus.FULFILLED);
+      };
+    } else if (this.getBaristaLineItems().isPresent()) {
+      if(this.baristaLineItems.stream()
+              .allMatch(lineItem -> {
+                return lineItem.getLineItemStatus().equals(LineItemStatus.FULFILLED);
+              })){
+        setOrderStatus(OrderStatus.FULFILLED);
+      };
+    }else if (this.getKitchenLineItems().isPresent()) {
+      if(this.kitchenLineItems.stream()
+              .allMatch(lineItem -> {
+                return lineItem.getLineItemStatus().equals(LineItemStatus.FULFILLED);
+              })){
+        setOrderStatus(OrderStatus.FULFILLED);
+      };
+    }
 
     // return the results
     OrderEventResult orderEventResult = new OrderEventResult();
@@ -79,17 +96,17 @@ public class Order extends PanacheEntityBase {
     return orderEventResult;
   }
 
-  private void markFulfilled(final String orderId) {
+  private void markFulfilled(final String lineItemId) {
     if (getBaristaLineItems().isPresent()) {
        getBaristaLineItems().get().stream().forEach(lineItem -> {
-         if(orderId.equals(lineItem.getItemId())){
+         if(lineItemId.equals(lineItem.getItemId())){
            lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
          }
        });
     }
     if (getKitchenLineItems().isPresent()) {
       getBaristaLineItems().get().stream().forEach(lineItem -> {
-        if(orderId.equals(lineItem.getItemId())){
+        if(lineItemId.equals(lineItem.getItemId())){
           lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
         }
       });
