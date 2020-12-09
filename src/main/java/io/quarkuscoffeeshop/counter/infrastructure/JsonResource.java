@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 @Path("/json")
@@ -32,20 +33,20 @@ public class JsonResource {
       OrderSource.WEB,
       Location.ATLANTA,
       null,
-      new ArrayList<LineItem>(){{
+      new ArrayList<>(){{
         add(new LineItem(
           Item.CAPPUCCINO,
           "Goofy",
           order
         ));
       }},
-      new ArrayList< LineItem >(){{
-        add(new LineItem(
-          Item.CAKEPOP,
-          "Goofy",
-          order
-        ));
-      }}
+            new ArrayList<>() {{
+              add(new LineItem(
+                      Item.CAKEPOP,
+                      "Goofy",
+                      order
+              ));
+            }}
     )).build();
   }
 

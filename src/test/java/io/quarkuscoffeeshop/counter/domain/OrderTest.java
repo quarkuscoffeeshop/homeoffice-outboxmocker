@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +24,7 @@ public class OrderTest {
       OrderSource.WEB,
       Location.ATLANTA,
       null,
-      new ArrayList<LineItem>() {{
+      new ArrayList<>() {{
         add(new LineItem(Item.COFFEE_BLACK, "Paul"));
       }},
       null);
@@ -36,10 +37,10 @@ public class OrderTest {
       OrderSource.WEB,
       Location.CHARLOTTE,
       null,
-      new ArrayList<LineItem>() {{
+      new ArrayList<>() {{
         add(new LineItem(Item.COFFEE_BLACK, "Paul"));
       }},
-      new ArrayList<LineItem>() {{
+      new ArrayList<>() {{
         add(new LineItem(Item.CAKEPOP, "John"));
       }});
 
@@ -48,9 +49,7 @@ public class OrderTest {
     assertNotNull(result);
     assertNotNull(result.getOrder());
     assertNotNull(result.getOutboxEvents());
-    result.getOutboxEvents().forEach(exportedEvent -> {
-      System.out.println(exportedEvent.getPayload());
-    });
+    result.getOutboxEvents().forEach(exportedEvent -> System.out.println(exportedEvent.getPayload()));
     assertEquals(1, result.getOutboxEvents().size());
     assertEquals(placeOrderCommand.getId(), result.getOrder().getOrderId());
   }
