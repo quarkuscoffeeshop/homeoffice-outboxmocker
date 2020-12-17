@@ -125,7 +125,7 @@ public class Order extends PanacheEntityBase {
     OrderEventResult orderEventResult = new OrderEventResult();
 
     // build the order from the PlaceOrderCommand
-    Order order = new Order();
+    Order order = new Order(placeOrderCommand.getId());
     order.setOrderSource(placeOrderCommand.getOrderSource());
     order.setTimestamp(placeOrderCommand.getTimestamp());
 
@@ -210,6 +210,10 @@ public class Order extends PanacheEntityBase {
 
   public Order() {
     this.orderId = UUID.randomUUID().toString();
+  }
+
+  public Order(String orderId){
+    this.orderId = orderId;
   }
 
   public Order(String orderId, OrderSource orderSource, String loyaltyMemberId, Instant timestamp, OrderStatus orderStatus, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {

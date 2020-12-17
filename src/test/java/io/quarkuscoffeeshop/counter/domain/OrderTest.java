@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -58,7 +59,9 @@ public class OrderTest {
   public void testUpdateOrderAfterOrderUpdatedEvent() {
 
     String orderId = UUID.randomUUID().toString();
-    Order order = new Order();
+    Order order = new Order(orderId);
+    order.setOrderSource(OrderSource.WEB);
+    order.setTimestamp(Instant.now());
     LineItem lineItem = new LineItem(Item.COFFEE_BLACK, "Lemmy", order);
     order.addBaristaLineItem(lineItem);
 
