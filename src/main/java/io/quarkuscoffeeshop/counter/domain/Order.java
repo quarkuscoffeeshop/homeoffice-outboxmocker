@@ -210,10 +210,12 @@ public class Order extends PanacheEntityBase {
 
   public Order() {
     this.orderId = UUID.randomUUID().toString();
+    this.timestamp = Instant.now();
   }
 
   public Order(String orderId){
     this.orderId = orderId;
+    this.timestamp = Instant.now();
   }
 
   public Order(String orderId, OrderSource orderSource, String loyaltyMemberId, Instant timestamp, OrderStatus orderStatus, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {
