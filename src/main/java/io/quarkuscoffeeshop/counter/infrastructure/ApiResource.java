@@ -1,13 +1,14 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
-import io.quarkuscoffeeshop.counter.domain.*;
+import io.quarkuscoffeeshop.counter.domain.Item;
+import io.quarkuscoffeeshop.counter.domain.LineItem;
+import io.quarkuscoffeeshop.counter.domain.Order;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Path("/api")
 @Produces(MediaType.APPLICATION_JSON)

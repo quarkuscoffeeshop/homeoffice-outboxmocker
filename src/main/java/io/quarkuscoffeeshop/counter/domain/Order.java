@@ -151,12 +151,14 @@ public class Order extends PanacheEntityBase {
     orderEventResult.setOrder(order);
     orderEventResult.addEvent(OrderCreatedEvent.of(order));
 
-    // if this order was places by a Loyalty Member add the appropriate event
+    // if this order was placed by a Loyalty Member add the appropriate event
     if (placeOrderCommand.getLoyaltyMemberId().isPresent()) {
+      logger.debug("creating LoyaltyMemberPurchaseEvent from {}", placeOrderCommand.toString());
       order.setLoyaltyMemberId(placeOrderCommand.getLoyaltyMemberId().get());
       orderEventResult.addEvent(LoyaltyMemberPurchaseEvent.of(order));
     }
 
+    logger.debug("returning {}", orderEventResult.toString());
     return orderEventResult;
   }
 

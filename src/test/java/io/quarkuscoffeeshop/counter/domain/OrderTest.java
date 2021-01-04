@@ -1,6 +1,8 @@
 package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
+import io.quarkuscoffeeshop.counter.domain.events.OrderCreatedEvent;
+import io.quarkuscoffeeshop.counter.domain.events.OrderUpdatedEvent;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import org.junit.jupiter.api.Test;
@@ -9,11 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderTest {
 
@@ -29,6 +29,16 @@ public class OrderTest {
         add(new LineItem(Item.COFFEE_BLACK, "Paul"));
       }},
       null);
+
+    OrderEventResult orderEventResult = Order.process(placeOrderCommand);
+    assertNotNull(orderEventResult, "The OrderEventResult should not be null");
+    assertNotNull(orderEventResult.getOrder(), "The OrderEventResult should contain an Order object");
+    assertNotNull(orderEventResult.getOutboxEvents(), "The OrderEventResult should contain a Collection of ExportedEvents");
+    assertEquals(1, orderEventResult.getOutboxEvents().size(), "There should be only 1 ExportedEvent");
+    orderEventResult.getOutboxEvents().forEach(exportedEvent -> logger.info("ExportedEvent {}", exportedEvent.getPayload()));
+    assertTrue((orderEventResult.getOutboxEvents().get(0).getClass().equals(OrderCreatedEvent.class)), "The event should be an instance of OrderCreatedEvent");
+    assertEquals(placeOrderCommand.getId(), orderEventResult.getOrder().getOrderId(), "The Order's id should match the PlaceOrderCommand's id");
+
   }
 
   @Test
@@ -45,14 +55,15 @@ public class OrderTest {
         add(new LineItem(Item.CAKEPOP, "John"));
       }});
 
-    OrderEventResult result = Order.process(placeOrderCommand);
-    System.out.println(result.toString());
-    assertNotNull(result);
-    assertNotNull(result.getOrder());
-    assertNotNull(result.getOutboxEvents());
-    result.getOutboxEvents().forEach(exportedEvent -> System.out.println(exportedEvent.getPayload()));
-    assertEquals(1, result.getOutboxEvents().size());
-    assertEquals(placeOrderCommand.getId(), result.getOrder().getOrderId());
+    OrderEventResult orderEventResult = Order.process(placeOrderCommand);
+    logger.debug("OrderEventResult {}", orderEventResult.toString());
+    assertNotNull(orderEventResult, "The OrderEventResult should not be null");
+    assertNotNull(orderEventResult.getOrder(), "The OrderEventResult should contain an Order object");
+    assertNotNull(orderEventResult.getOutboxEvents(), "The OrderEventResult should contain a Collection of ExportedEvents");
+    assertEquals(1, orderEventResult.getOutboxEvents().size(), "There should be only 1 ExportedEvent");
+    orderEventResult.getOutboxEvents().forEach(exportedEvent -> logger.info("ExportedEvent {}", exportedEvent.getPayload()));
+    assertTrue((orderEventResult.getOutboxEvents().get(0).getClass().equals(OrderCreatedEvent.class)), "The event should be an instance of OrderCreatedEvent");
+    assertEquals(placeOrderCommand.getId(), orderEventResult.getOrder().getOrderId(), "The Order's id should match the PlaceOrderCommand's id");
   }
 
   @Test
@@ -68,11 +79,12 @@ public class OrderTest {
     OrderTicket orderTicket = new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName());
 
     OrderEventResult orderEventResult = order.applyOrderTicketUp(orderTicket);
-    assertNotNull(orderEventResult);
-    assertNotNull(orderEventResult.getOrder());
-    assertNotNull(orderEventResult.getOutboxEvents());
-    assertEquals(1, orderEventResult.getOutboxEvents().size());
-    assertEquals(orderId, orderEventResult.getOrder().getOrderId());
+    assertNotNull(orderEventResult, "The OrderEventResult should not be null");
+    assertNotNull(orderEventResult.getOrder(), "The OrderEventResult should contain an Order object");
+    assertEquals(order.getOrderId(), orderEventResult.getOrder().getOrderId(), "The Order's id should match the Order's id");
+    assertNotNull(orderEventResult.getOutboxEvents(), "The OrderEventResult should contain a Collection of ExportedEvents");
+    assertEquals(1, orderEventResult.getOutboxEvents().size(), "There should be only 1 ExportedEvent");
+    assertTrue((orderEventResult.getOutboxEvents().get(0).getClass().equals(OrderUpdatedEvent.class)), "The event should be an instance of OrderUpdatedEvent");
     assertEquals(LineItemStatus.FULFILLED, orderEventResult.getOrder().getBaristaLineItems().get().get(0).getLineItemStatus());
 
   }

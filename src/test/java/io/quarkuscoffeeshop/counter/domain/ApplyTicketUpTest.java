@@ -6,10 +6,8 @@ import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.UUID;
 
-import static org.apache.groovy.json.internal.Chr.add;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
