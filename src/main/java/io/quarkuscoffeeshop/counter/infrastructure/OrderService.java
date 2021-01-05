@@ -4,6 +4,7 @@ import io.debezium.outbox.quarkus.ExportedEvent;
 import io.quarkuscoffeeshop.counter.domain.Order;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.slf4j.Logger;
@@ -23,13 +24,15 @@ public class OrderService {
   Event<ExportedEvent<?, ?>> event;
 
   @Channel("barista")
-  Emitter<String> baristaEmitter;
+  Emitter<OrderTicket> baristaEmitter;
 
-  @Channel("barista")
-  Emitter<String> kitchenEmitter;
+/*
+  @Channel("kitchen")
+  Emitter<OrderTicket> kitchenEmitter;
 
   @Channel("orders")
   Emitter<String> ordersEmitter;
+*/
 
 
   @Transactional
@@ -41,5 +44,17 @@ public class OrderService {
     orderEventResult.getOutboxEvents().forEach(exportedEvent -> {
       event.fire(exportedEvent);
     });
+    if(!orderEventResult.getBaristaTickets().isEmpty()){
+      orderEventResult.getBaristaTickets().forEach(baristaTicket -> {
+        baristaEmitter.send(baristaTicket);
+      });
+    }
+/*
+    if (!orderEventResult.getKitchenTickets().isEmpty()) {
+      orderEventResult.getKitchenTickets().forEach(kitchenTicket -> {
+        kitchenEmitter.send(kitchenTicket);
+      });
+    }
+*/
   }
 }
