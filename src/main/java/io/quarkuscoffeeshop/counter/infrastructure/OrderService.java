@@ -2,6 +2,7 @@ package io.quarkuscoffeeshop.counter.infrastructure;
 
 import io.debezium.outbox.quarkus.ExportedEvent;
 import io.quarkuscoffeeshop.counter.domain.Order;
+import io.quarkuscoffeeshop.counter.domain.OrderRepository;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
@@ -19,6 +20,9 @@ import javax.transaction.Transactional;
 public class OrderService {
 
   Logger logger = LoggerFactory.getLogger(OrderService.class);
+
+  @Inject
+  OrderRepository orderRepository;
 
   @Inject
   Event<ExportedEvent<?, ?>> event;
@@ -40,7 +44,7 @@ public class OrderService {
     logger.debug("onPlaceOrderCommand {}", placeOrderCommand);
     OrderEventResult orderEventResult = Order.process(placeOrderCommand);
     logger.debug("OrderEventResult returned: {}", orderEventResult);
-    orderEventResult.getOrder().persist();
+    orderRepository.persist(orderEventResult.getOrder());
     orderEventResult.getOutboxEvents().forEach(exportedEvent -> {
       event.fire(exportedEvent);
     });

@@ -1,22 +1,32 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 import io.quarkuscoffeeshop.counter.commands.CommandMocker;
+import io.quarkuscoffeeshop.counter.domain.Order;
+import io.quarkuscoffeeshop.counter.domain.OrderRepository;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@QuarkusTest
+@QuarkusTest @Transactional
 public class OrderServiceTest {
 
     Logger logger = LoggerFactory.getLogger(OrderServiceTest.class);
+
+    @InjectMock
+    OrderRepository orderRepository;
 
     @Inject
     OrderService orderService;
