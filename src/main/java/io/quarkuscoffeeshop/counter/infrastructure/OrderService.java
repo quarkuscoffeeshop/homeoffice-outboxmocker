@@ -33,11 +33,6 @@ public class OrderService {
   @Channel("kitchen")
   Emitter<OrderTicket> kitchenEmitter;
 
-/*
-  @Channel("orders")
-  Emitter<String> ordersEmitter;
-*/
-
   @Transactional
   public void onPlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
 
@@ -58,5 +53,17 @@ public class OrderService {
         kitchenEmitter.send(kitchenTicket);
       });
     }
+  }
+
+  @Transactional
+  public void onOrderUp(final OrderTicket orderTicket) {
+
+    logger.debug("onOrderUp: {}", orderTicket);
+    OrderEventResult orderEventResult = Order.applyOrderTicketUp(orderTicket);
+    logger.debug("OrderEventResult returned: {}", orderEventResult);
+    orderRepository.persist(orderEventResult.getOrder());
+    orderEventResult.getOutboxEvents().forEach(exportedEvent -> {
+      event.fire(exportedEvent);
+    });
   }
 }

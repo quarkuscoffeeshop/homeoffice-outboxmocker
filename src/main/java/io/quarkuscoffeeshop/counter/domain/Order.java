@@ -53,64 +53,61 @@ public class Order extends PanacheEntityBase {
    * @param orderTicket
    * @return OrderEventResult
    */
-  public OrderEventResult applyOrderTicketUp(final OrderTicket orderTicket) {
+  public static OrderEventResult applyOrderTicketUp(final OrderTicket orderTicket) {
 
+    Order order = Order.findById(orderTicket.getOrderId());
     // set the LineItem's new status
-    markFulfilled(orderTicket.getLineItemId());
+    if (order.getBaristaLineItems().isPresent()) {
+      order.getBaristaLineItems().get().stream().forEach(lineItem -> {
+        if(lineItem.getItemId().equals(lineItem.getItemId())){
+          lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
+        }
+      });
+    }
+    if (order.getKitchenLineItems().isPresent()) {
+      order.getBaristaLineItems().get().stream().forEach(lineItem -> {
+        if(lineItem.getItemId().equals(lineItem.getItemId())){
+          lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
+        }
+      });
+    }
 
     // create the domain event
-    OrderUpdatedEvent orderUpdatedEvent = OrderUpdatedEvent.of(this);
+    OrderUpdatedEvent orderUpdatedEvent = OrderUpdatedEvent.of(order);
 
     // create the update value object
     OrderUpdate orderUpdate = new OrderUpdate(orderTicket.getOrderId(), orderTicket.getLineItemId(), OrderStatus.FULFILLED);
 
     // if there are both barista and kitchen items concatenate them before checking status
-    if (this.getBaristaLineItems().isPresent() && this.getKitchenLineItems().isPresent()) {
+    if (order.getBaristaLineItems().isPresent() && order.getKitchenLineItems().isPresent()) {
       // check the status of the Order itself and update if necessary
-      if(Stream.concat(this.baristaLineItems.stream(), this.kitchenLineItems.stream())
+      if(Stream.concat(order.baristaLineItems.stream(), order.kitchenLineItems.stream())
               .allMatch(lineItem -> {
                 return lineItem.getLineItemStatus().equals(LineItemStatus.FULFILLED);
               })){
-        setOrderStatus(OrderStatus.FULFILLED);
+        order.setOrderStatus(OrderStatus.FULFILLED);
       };
-    } else if (this.getBaristaLineItems().isPresent()) {
-      if(this.baristaLineItems.stream()
+    } else if (order.getBaristaLineItems().isPresent()) {
+      if(order.baristaLineItems.stream()
               .allMatch(lineItem -> {
                 return lineItem.getLineItemStatus().equals(LineItemStatus.FULFILLED);
               })){
-        setOrderStatus(OrderStatus.FULFILLED);
+        order.setOrderStatus(OrderStatus.FULFILLED);
       };
-    }else if (this.getKitchenLineItems().isPresent()) {
-      if(this.kitchenLineItems.stream()
+    }else if (order.getKitchenLineItems().isPresent()) {
+      if(order.kitchenLineItems.stream()
               .allMatch(lineItem -> {
                 return lineItem.getLineItemStatus().equals(LineItemStatus.FULFILLED);
               })){
-        setOrderStatus(OrderStatus.FULFILLED);
+        order.setOrderStatus(OrderStatus.FULFILLED);
       };
     }
 
     // return the results
     OrderEventResult orderEventResult = new OrderEventResult();
-    orderEventResult.setOrder(this);
+    orderEventResult.setOrder(order);
     orderEventResult.addEvent(orderUpdatedEvent);
     return orderEventResult;
-  }
-
-  private void markFulfilled(final String lineItemId) {
-    if (getBaristaLineItems().isPresent()) {
-       getBaristaLineItems().get().stream().forEach(lineItem -> {
-         if(lineItemId.equals(lineItem.getItemId())){
-           lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
-         }
-       });
-    }
-    if (getKitchenLineItems().isPresent()) {
-      getBaristaLineItems().get().stream().forEach(lineItem -> {
-        if(lineItemId.equals(lineItem.getItemId())){
-          lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
-        }
-      });
-    }
   }
 
   /**

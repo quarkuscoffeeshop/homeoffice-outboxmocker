@@ -1,6 +1,7 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import io.smallrye.reactive.messaging.annotations.Merge;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
@@ -18,5 +19,11 @@ public class KafkaService {
     @Transactional
     public void orderIn(final PlaceOrderCommand placeOrderCommand) {
         orderService.onPlaceOrderCommand(placeOrderCommand);
+    }
+
+    @Incoming("orders-up")
+    @Transactional
+    public void orderUp(final OrderTicket orderTicket) {
+        orderService.onOrderUp(orderTicket);
     }
 }
