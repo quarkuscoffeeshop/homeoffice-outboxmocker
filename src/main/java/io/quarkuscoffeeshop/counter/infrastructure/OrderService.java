@@ -26,35 +26,33 @@ public class OrderService {
   @Channel("barista")
   Emitter<OrderTicket> baristaEmitter;
 
-/*
   @Channel("kitchen")
   Emitter<OrderTicket> kitchenEmitter;
 
+/*
   @Channel("orders")
   Emitter<String> ordersEmitter;
 */
-
 
   @Transactional
   public void onPlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
 
     logger.debug("onPlaceOrderCommand {}", placeOrderCommand);
     OrderEventResult orderEventResult = Order.process(placeOrderCommand);
+    logger.debug("OrderEventResult returned: {}", orderEventResult);
     orderEventResult.getOrder().persist();
     orderEventResult.getOutboxEvents().forEach(exportedEvent -> {
       event.fire(exportedEvent);
     });
-    if(!orderEventResult.getBaristaTickets().isEmpty()){
-      orderEventResult.getBaristaTickets().forEach(baristaTicket -> {
+    if(orderEventResult.getBaristaTickets().isPresent()){
+      orderEventResult.getBaristaTickets().get().forEach(baristaTicket -> {
         baristaEmitter.send(baristaTicket);
       });
     }
-/*
-    if (!orderEventResult.getKitchenTickets().isEmpty()) {
-      orderEventResult.getKitchenTickets().forEach(kitchenTicket -> {
+    if (orderEventResult.getKitchenTickets().isPresent()) {
+      orderEventResult.getKitchenTickets().get().forEach(kitchenTicket -> {
         kitchenEmitter.send(kitchenTicket);
       });
     }
-*/
   }
 }

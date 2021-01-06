@@ -1,18 +1,15 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkuscoffeeshop.counter.domain.Item;
-import io.quarkuscoffeeshop.counter.domain.LineItem;
-import io.quarkuscoffeeshop.counter.domain.Location;
-import io.quarkuscoffeeshop.counter.domain.OrderSource;
+import io.quarkuscoffeeshop.counter.commands.CommandMocker;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -25,25 +22,57 @@ public class OrderServiceTest {
     OrderService orderService;
 
     @Inject
-    BaristaStream baristaStream;
+    BaristaStream ticketStream;
+
+    @Inject
+    KitchenStream kitchenStream;
+
+    @AfterEach
+    public void reset() {
+        ticketStream.reset();
+        kitchenStream.reset();
+    }
 
     @Test
     public void testPlacingBaristaOnlyOrder() {
 
-        PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
-                OrderSource.WEB,
-                Location.ATLANTA,
-                null,
-                new ArrayList<>() {{
-                    add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-                }},
-                null);
+        PlaceOrderCommand placeOrderCommand = CommandMocker.placeOrderCommandSingleBlackCoffee();
 
         logger.info("Testing order with: {}", placeOrderCommand);
         orderService.onPlaceOrderCommand(placeOrderCommand);
-        assertEquals(baristaStream.getOrderTickets().size(), 1, "1 ticket should have been delivered to the 'barista' stream");
-        logger.info("Ticket received {}", baristaStream.getOrderTickets().get(0));
-        OrderTicket orderTicket = baristaStream.getOrderTickets().get(0);
+        assertEquals(ticketStream.getOrderTickets().size(), 1, "1 ticket should have been delivered to the 'barista' stream");
+        logger.info("Ticket received {}", ticketStream.getOrderTickets().get(0));
+        OrderTicket orderTicket = ticketStream.getOrderTickets().get(0);
         assertEquals(placeOrderCommand.getId(), orderTicket.getOrderId(), "The order id should be the same");
+    }
+
+    @Test
+    public void testPlacingKitchenOnlyOrder() {
+
+        PlaceOrderCommand placeOrderCommand = CommandMocker.placeOrderCommandSingleCroissant();
+
+        logger.info("Testing order with: {}", placeOrderCommand);
+        orderService.onPlaceOrderCommand(placeOrderCommand);
+        assertEquals(kitchenStream.getOrderTickets().size(), 1, "1 ticket should have been delivered to the 'kitchen' stream");
+        logger.info("Ticket received {}", kitchenStream.getOrderTickets().get(0));
+        OrderTicket orderTicket = kitchenStream.getOrderTickets().get(0);
+        assertEquals(placeOrderCommand.getId(), orderTicket.getOrderId(), "The order id should be the same");
+    }
+
+    @Test
+    public void testPlacingBaristaAndKitchenOrder() {
+
+        PlaceOrderCommand placeOrderCommand = CommandMocker.placeOrderCommandBlackCoffeeAndCroissant();
+
+        logger.info("Testing order with: {}", placeOrderCommand);
+        orderService.onPlaceOrderCommand(placeOrderCommand);
+        assertEquals(ticketStream.getOrderTickets().size(), 1, "1 ticket should have been delivered to the 'barista' stream");
+        logger.info("Ticket received {}", ticketStream.getOrderTickets().get(0));
+        OrderTicket baristaTicket = ticketStream.getOrderTickets().get(0);
+        assertEquals(placeOrderCommand.getId(), baristaTicket.getOrderId(), "The order id should be the same");
+        assertEquals(kitchenStream.getOrderTickets().size(), 1, "1 ticket should have been delivered to the 'kitchen' stream");
+        logger.info("Ticket received {}", kitchenStream.getOrderTickets().get(0));
+        OrderTicket kitchenTicket = kitchenStream.getOrderTickets().get(0);
+        assertEquals(placeOrderCommand.getId(), kitchenTicket.getOrderId(), "The order id should be the same");
     }
 }

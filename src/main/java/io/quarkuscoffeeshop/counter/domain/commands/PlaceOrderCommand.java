@@ -6,6 +6,7 @@ import io.quarkuscoffeeshop.counter.domain.OrderSource;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,6 +39,32 @@ public class PlaceOrderCommand {
     this.baristaLineItems = baristaLineItems;
     this.kitchenLineItems = kitchenLineItems;
     this.timestamp = Instant.now();
+  }
+
+  @Override
+  public String toString() {
+    return "PlaceOrderCommand{" +
+            "id='" + id + '\'' +
+            ", orderSource=" + orderSource +
+            ", location=" + location +
+            ", loyaltyMemberId='" + loyaltyMemberId + '\'' +
+            ", baristaLineItems=" + baristaLineItems +
+            ", kitchenLineItems=" + kitchenLineItems +
+            ", timestamp=" + timestamp +
+            '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    PlaceOrderCommand that = (PlaceOrderCommand) o;
+    return Objects.equals(id, that.id) && orderSource == that.orderSource && location == that.location && Objects.equals(loyaltyMemberId, that.loyaltyMemberId) && Objects.equals(baristaLineItems, that.baristaLineItems) && Objects.equals(kitchenLineItems, that.kitchenLineItems) && Objects.equals(timestamp, that.timestamp);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, orderSource, location, loyaltyMemberId, baristaLineItems, kitchenLineItems, timestamp);
   }
 
   public Optional<List<LineItem>> getBaristaLineItems() {

@@ -5,6 +5,7 @@ import io.quarkuscoffeeshop.counter.domain.Order;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Value object returned from an Order.  Contains the Order aggregate and a List ExportedEvent
@@ -57,6 +58,16 @@ public class OrderEventResult {
     this.kitchenTickets.add(orderTicket);
   }
 
+  public Optional<List<OrderTicket>> getBaristaTickets() {
+    return Optional.ofNullable(baristaTickets);
+  }
+
+  public Optional<List<OrderTicket>> getKitchenTickets() {
+    return Optional.ofNullable(kitchenTickets);
+  }
+
+
+
   @Override
   public String toString() {
     return "OrderEventResult{" +
@@ -102,16 +113,8 @@ public class OrderEventResult {
     this.outboxEvents = outboxEvents;
   }
 
-  public List<OrderTicket> getBaristaTickets() {
-    return baristaTickets;
-  }
-
   public void setBaristaTickets(List<OrderTicket> baristaTickets) {
     this.baristaTickets = baristaTickets;
-  }
-
-  public List<OrderTicket> getKitchenTickets() {
-    return kitchenTickets;
   }
 
   public void setKitchenTickets(List<OrderTicket> kitchenTickets) {
