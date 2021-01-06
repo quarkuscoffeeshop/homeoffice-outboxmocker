@@ -2,6 +2,7 @@ package io.quarkuscoffeeshop.counter.domain.valueobjects;
 
 import io.debezium.outbox.quarkus.ExportedEvent;
 import io.quarkuscoffeeshop.counter.domain.Order;
+import io.quarkuscoffeeshop.counter.domain.events.LoyaltyMemberPurchaseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +23,11 @@ public class OrderEventResult {
 
   private List<OrderUpdate> orderUpdates;
 
-  public Order getOrder() {
-    return order;
+  public OrderEventResult() {
   }
 
-  public void setOrder(Order order) {
-    this.order = order;
+  public Order getOrder() {
+    return order;
   }
 
   public void addEvent(final ExportedEvent event) {
@@ -127,5 +127,9 @@ public class OrderEventResult {
 
   public void setOrderUpdates(List<OrderUpdate> orderUpdates) {
     this.orderUpdates = orderUpdates;
+  }
+
+  public void setOrder(final Order order) {
+    this.order = order;
   }
 }

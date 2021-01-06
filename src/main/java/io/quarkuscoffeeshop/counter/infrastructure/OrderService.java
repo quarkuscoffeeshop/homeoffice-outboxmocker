@@ -6,6 +6,7 @@ import io.quarkuscoffeeshop.counter.domain.OrderRepository;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderUpdate;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.slf4j.Logger;
@@ -33,6 +34,9 @@ public class OrderService {
   @Channel("kitchen")
   Emitter<OrderTicket> kitchenEmitter;
 
+  @Channel("order-updates")
+  Emitter<OrderUpdate> orderUpdateEmitter;
+
   @Transactional
   public void onPlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
 
@@ -59,11 +63,15 @@ public class OrderService {
   public void onOrderUp(final OrderTicket orderTicket) {
 
     logger.debug("onOrderUp: {}", orderTicket);
-    OrderEventResult orderEventResult = Order.applyOrderTicketUp(orderTicket);
+    Order order = orderRepository.findById(orderTicket.getOrderId());
+    OrderEventResult orderEventResult = order.applyOrderTicketUp(orderTicket);
     logger.debug("OrderEventResult returned: {}", orderEventResult);
     orderRepository.persist(orderEventResult.getOrder());
     orderEventResult.getOutboxEvents().forEach(exportedEvent -> {
       event.fire(exportedEvent);
+    });
+    orderEventResult.getOrderUpdates().forEach(orderUpdate -> {
+      orderUpdateEmitter.send(orderUpdate);
     });
   }
 }

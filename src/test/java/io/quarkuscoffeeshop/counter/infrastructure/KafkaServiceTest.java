@@ -38,7 +38,7 @@ public class KafkaServiceTest {
     @Test
     public void testOrderUp() {
 
-        OrderTicket orderTicket = ValueObjectMocker.blackCoffee();
+        OrderTicket orderTicket = ValueObjectMocker.orderTicketBlackCoffee();
         ordersUpEmitter.send(orderTicket);
         Mockito.verify(orderService, Mockito.times(1)).onOrderUp(any(OrderTicket.class));
     }

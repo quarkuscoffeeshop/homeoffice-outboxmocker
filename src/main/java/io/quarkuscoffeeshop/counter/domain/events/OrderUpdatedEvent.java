@@ -84,6 +84,6 @@ public class OrderUpdatedEvent implements ExportedEvent<String, JsonNode> {
 
   @Override
   public JsonNode getPayload() {
-    return null;
+    return jsonNode;
   }
 }
