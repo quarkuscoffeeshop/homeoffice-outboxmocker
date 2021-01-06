@@ -6,6 +6,7 @@ import io.quarkuscoffeeshop.counter.domain.LineItem;
 import io.quarkuscoffeeshop.counter.domain.Location;
 import io.quarkuscoffeeshop.counter.domain.OrderSource;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class OrderServiceTest {
     BaristaStream baristaStream;
 
     @Test
-    public void testPlacingOrder() {
+    public void testPlacingBaristaOnlyOrder() {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
@@ -38,9 +39,11 @@ public class OrderServiceTest {
                 }},
                 null);
 
+        logger.info("Testing order with: {}", placeOrderCommand);
         orderService.onPlaceOrderCommand(placeOrderCommand);
         assertEquals(baristaStream.getOrderTickets().size(), 1, "1 ticket should have been delivered to the 'barista' stream");
         logger.info("Ticket received {}", baristaStream.getOrderTickets().get(0));
-        System.out.println(baristaStream.getOrderTickets().get(0).toString());
+        OrderTicket orderTicket = baristaStream.getOrderTickets().get(0);
+        assertEquals(placeOrderCommand.getId(), orderTicket.getOrderId(), "The order id should be the same");
     }
 }

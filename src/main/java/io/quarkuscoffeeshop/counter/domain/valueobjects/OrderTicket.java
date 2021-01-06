@@ -54,7 +54,7 @@ public class OrderTicket {
 
   @Override
   public String toString() {
-    return "OrderUp{" +
+    return "OrderTicket{" +
       "orderId='" + orderId + '\'' +
       ", id=" + lineItemId +
       ", item=" + item +
