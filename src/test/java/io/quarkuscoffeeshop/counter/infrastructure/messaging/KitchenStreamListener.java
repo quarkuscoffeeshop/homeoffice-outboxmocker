@@ -1,18 +1,22 @@
-package io.quarkuscoffeeshop.counter.infrastructure;
+package io.quarkuscoffeeshop.counter.infrastructure.messaging;
 
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
-import java.util.Objects;
 
 @ApplicationScoped
-public class KitchenStream extends TicketStream{
+public class KitchenStreamListener extends StreamListener {
 
     @Incoming("kitchen")
     public void kitchenIn(final OrderTicket orderTicket) {
-        this.orderTickets.add(orderTicket);
+        this.objects.add(orderTicket);
+    }
+
+    @Override
+    public ArrayList<OrderTicket> getObjects() {
+        return this.objects;
     }
 
 }

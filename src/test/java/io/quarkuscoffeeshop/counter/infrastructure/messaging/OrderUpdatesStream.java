@@ -1,6 +1,5 @@
-package io.quarkuscoffeeshop.counter.infrastructure;
+package io.quarkuscoffeeshop.counter.infrastructure.messaging;
 
-import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderUpdate;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
