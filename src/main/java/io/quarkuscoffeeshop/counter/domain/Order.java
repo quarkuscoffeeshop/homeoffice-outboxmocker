@@ -28,6 +28,7 @@ public class Order extends PanacheEntityBase {
   @Column(nullable = false, unique = true, name = "order_id")
   private String orderId;
 
+  @Enumerated(EnumType.STRING)
   private OrderSource orderSource;
 
   private String loyaltyMemberId;

@@ -18,6 +18,7 @@
        orderId varchar(255) not null,
         loyaltyMemberId varchar(255),
         orderSource varchar(255),
+        orderStatus varchar(255),
         timestamp timestamp,
         primary key (orderId)
     );
