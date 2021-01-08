@@ -16,6 +16,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
 public class OrderService {
@@ -38,25 +40,27 @@ public class OrderService {
   Emitter<OrderUpdate> orderUpdateEmitter;
 
   @Transactional
-  public void onPlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
+  public CompletionStage<Void> onPlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
 
-    logger.debug("onPlaceOrderCommand {}", placeOrderCommand);
-    OrderEventResult orderEventResult = Order.process(placeOrderCommand);
-    logger.debug("OrderEventResult returned: {}", orderEventResult);
-    orderRepository.persist(orderEventResult.getOrder());
-    orderEventResult.getOutboxEvents().forEach(exportedEvent -> {
-      event.fire(exportedEvent);
+    return CompletableFuture.runAsync(() -> {
+      logger.debug("onPlaceOrderCommand {}", placeOrderCommand);
+      OrderEventResult orderEventResult = Order.process(placeOrderCommand);
+      logger.debug("OrderEventResult returned: {}", orderEventResult);
+      orderRepository.persist(orderEventResult.getOrder());
+      orderEventResult.getOutboxEvents().forEach(exportedEvent -> {
+        event.fire(exportedEvent);
+      });
+      if(orderEventResult.getBaristaTickets().isPresent()){
+        orderEventResult.getBaristaTickets().get().forEach(baristaTicket -> {
+          baristaEmitter.send(baristaTicket);
+        });
+      }
+      if (orderEventResult.getKitchenTickets().isPresent()) {
+        orderEventResult.getKitchenTickets().get().forEach(kitchenTicket -> {
+          kitchenEmitter.send(kitchenTicket);
+        });
+      }
     });
-    if(orderEventResult.getBaristaTickets().isPresent()){
-      orderEventResult.getBaristaTickets().get().forEach(baristaTicket -> {
-        baristaEmitter.send(baristaTicket);
-      });
-    }
-    if (orderEventResult.getKitchenTickets().isPresent()) {
-      orderEventResult.getKitchenTickets().get().forEach(kitchenTicket -> {
-        kitchenEmitter.send(kitchenTicket);
-      });
-    }
   }
 
   @Transactional

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.*;
 
-@QuarkusMain
+//@QuarkusMain
 public class MockerService implements QuarkusApplication {
 
     final Logger logger = LoggerFactory.getLogger(MockerService.class);
