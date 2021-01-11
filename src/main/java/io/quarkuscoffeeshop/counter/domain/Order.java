@@ -65,7 +65,7 @@ public class Order extends PanacheEntityBase {
       });
     }
     if (this.getKitchenLineItems().isPresent()) {
-      this.getBaristaLineItems().get().stream().forEach(lineItem -> {
+      this.getKitchenLineItems().get().stream().forEach(lineItem -> {
         if(lineItem.getItemId().equals(lineItem.getItemId())){
           lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
         }
@@ -121,6 +121,7 @@ public class Order extends PanacheEntityBase {
    */
   public static OrderEventResult process(final PlaceOrderCommand placeOrderCommand) {
 
+    // create the return value
     OrderEventResult orderEventResult = new OrderEventResult();
 
     // build the order from the PlaceOrderCommand
@@ -130,6 +131,7 @@ public class Order extends PanacheEntityBase {
 
     if (placeOrderCommand.getBaristaLineItems().isPresent()) {
       logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaLineItems().get().size());
+
       placeOrderCommand.getBaristaLineItems().get().forEach(v -> {
         logger.debug("createOrderFromCommand adding baristaItem from {}", v.toString());
         LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);

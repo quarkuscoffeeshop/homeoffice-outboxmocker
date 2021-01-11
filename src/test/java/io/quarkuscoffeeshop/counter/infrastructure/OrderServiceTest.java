@@ -10,6 +10,7 @@ import io.quarkuscoffeeshop.counter.infrastructure.messaging.BaristaStreamListen
 import io.quarkuscoffeeshop.counter.infrastructure.messaging.KitchenStreamListener;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
