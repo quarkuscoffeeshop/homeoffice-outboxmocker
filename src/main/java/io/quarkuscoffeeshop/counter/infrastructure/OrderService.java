@@ -66,7 +66,18 @@ public class OrderService {
             logger.debug("Firing event: {}", exportedEvent);
             event.fire(exportedEvent);
         });
+        if(orderEventResult.getBaristaTickets().isPresent()){
+            orderEventResult.getBaristaTickets().get().forEach(baristaTicket -> {
+                logger.debug("Sending Ticket to Barista Service: {}", baristaTicket);
+                baristaEmitter.send(baristaTicket);
+            });
+        }
 
+        if (orderEventResult.getKitchenTickets().isPresent()) {
+            orderEventResult.getKitchenTickets().get().forEach(kitchenTicket -> {
+                kitchenEmitter.send(kitchenTicket);
+            });
+        }
     }
 
   @Transactional
