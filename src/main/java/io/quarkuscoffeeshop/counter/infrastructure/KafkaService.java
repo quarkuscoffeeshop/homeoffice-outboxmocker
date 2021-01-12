@@ -2,6 +2,7 @@ package io.quarkuscoffeeshop.counter.infrastructure;
 
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import io.smallrye.common.annotation.Blocking;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
@@ -29,9 +30,10 @@ public class KafkaService {
     }
 
     @Incoming("orders-up")
+    @Blocking
     @Transactional
-    public void orderUp(final OrderTicket orderTicket) {
-        logger.debug("OrderTicket received: {}", orderTicket);
-        orderService.onOrderUp(orderTicket);
+    public void orderUp(final TicketUp ticketUp) {
+        logger.debug("OrderTicket received: {}", ticketUp);
+        orderService.onOrderUp(ticketUp);
     }
 }

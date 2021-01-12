@@ -5,6 +5,7 @@ import io.quarkuscoffeeshop.counter.domain.events.OrderCreatedEvent;
 import io.quarkuscoffeeshop.counter.domain.events.OrderUpdatedEvent;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,9 +77,9 @@ public class OrderTest {
     LineItem lineItem = new LineItem(Item.COFFEE_BLACK, "Lemmy", order);
     order.addBaristaLineItem(lineItem);
 
-    OrderTicket orderTicket = new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName());
+    TicketUp ticketUp = new TicketUp(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName(), "baristaNme");
 
-    OrderEventResult orderEventResult = order.applyOrderTicketUp(orderTicket);
+    OrderEventResult orderEventResult = order.applyOrderTicketUp(ticketUp);
     assertNotNull(orderEventResult, "The OrderEventResult should not be null");
     assertNotNull(orderEventResult.getOrder(), "The OrderEventResult should contain an Order object");
     assertEquals(order.getOrderId(), orderEventResult.getOrder().getOrderId(), "The Order's id should match the Order's id");

@@ -7,6 +7,7 @@ import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderUpdate;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.eclipse.microprofile.context.ThreadContext;
 import org.eclipse.microprofile.reactive.messaging.Channel;
@@ -30,12 +31,6 @@ public class OrderService {
 
   @Inject
   ThreadContext threadContext;
-
-  @Inject
-  ManagedExecutor managedExecutor;
-
-  @Inject
-  ManagedExecutor managedExecutor2;
 
   @Inject
   OrderRepository orderRepository;
@@ -117,6 +112,7 @@ public class OrderService {
 //    });
   }
 
+/*
   @Transactional
   public CompletableFuture<Void> processPlaceOrderCommand(final PlaceOrderCommand placeOrderCommand){
 
@@ -126,6 +122,7 @@ public class OrderService {
 
       logger.debug("OrderEventResult returned: {}", orderEventResult);
 
+*/
 /*
       orderRepository.persist(orderEventResult.getOrder());
 
@@ -141,7 +138,8 @@ public class OrderService {
               kitchenEmitter.send(kitchenTicket);
           });
       }
-*/
+*//*
+
       return persistOrder(orderEventResult.getOrder())
               .thenRunAsync(
                       () -> {
@@ -169,31 +167,15 @@ public class OrderService {
               }
       );
   }
+*/
 
-    CompletableFuture<Void> fireEvents(final List<ExportedEvent> events) {
-        return CompletableFuture.supplyAsync(() -> {
-            events.forEach(exportedEvent -> {
-                event.fire(exportedEvent);
-                logger.debug("Fired event: {}", exportedEvent);
-            });
-            return null;
-        }, managedExecutor);
-    }
-
-  CompletableFuture<Void> persistOrder(final Order order) {
-    return CompletableFuture.supplyAsync(() -> {
-        orderRepository.persist(order);
-        logger.debug("order persisted: {}", order);
-        return null;
-    }, managedExecutor2);
-  }
 
   @Transactional
-  public void onOrderUp(final OrderTicket orderTicket) {
+  public void onOrderUp(final TicketUp ticketUp) {
 
-    logger.debug("onOrderUp: {}", orderTicket);
-    Order order = orderRepository.findById(orderTicket.getOrderId());
-    OrderEventResult orderEventResult = order.applyOrderTicketUp(orderTicket);
+    logger.debug("onOrderUp: {}", ticketUp);
+    Order order = orderRepository.findById(ticketUp.getOrderId());
+    OrderEventResult orderEventResult = order.applyOrderTicketUp(ticketUp);
     logger.debug("OrderEventResult returned: {}", orderEventResult);
     orderRepository.persist(orderEventResult.getOrder());
     orderEventResult.getOutboxEvents().forEach(exportedEvent -> {

@@ -8,6 +8,7 @@ import io.quarkuscoffeeshop.counter.domain.events.OrderUpdatedEvent;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderUpdate;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +52,10 @@ public class Order extends PanacheEntityBase {
    *
    * All corresponding objects are returned in an OrderEventResult
    *
-   * @param orderTicket
+   * @param ticketUp
    * @return OrderEventResult
    */
-  public OrderEventResult applyOrderTicketUp(final OrderTicket orderTicket) {
+  public OrderEventResult applyOrderTicketUp(final TicketUp ticketUp) {
 
     // set the LineItem's new status
     if (this.getBaristaLineItems().isPresent()) {
@@ -101,7 +102,7 @@ public class Order extends PanacheEntityBase {
     OrderUpdatedEvent orderUpdatedEvent = OrderUpdatedEvent.of(this);
 
     // create the update value object
-    OrderUpdate orderUpdate = new OrderUpdate(orderTicket.getOrderId(), orderTicket.getLineItemId(), OrderStatus.FULFILLED);
+    OrderUpdate orderUpdate = new OrderUpdate(ticketUp.getOrderId(), ticketUp.getLineItemId(), OrderStatus.FULFILLED);
 
     OrderEventResult orderEventResult = new OrderEventResult();
     orderEventResult.setOrder(this);
