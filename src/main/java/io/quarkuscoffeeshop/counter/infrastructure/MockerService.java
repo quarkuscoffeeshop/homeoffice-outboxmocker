@@ -35,28 +35,33 @@ public class MockerService implements QuarkusApplication {
                 }
                 if (orders %2 == 0) {
                     PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
+                            UUID.randomUUID().toString(),
                             OrderSource.COUNTER,
                             Location.ATLANTA,
                             loyaltyMemberId,
+                            Optional.of(
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-                            }},
+                            }}),
                             null);
                     OrderEventResult orderEventResult = Order.process(placeOrderCommand);
-                    orderService.onPlaceOrderCommand(placeOrderCommand);
+                    orderService.onOrderIn(placeOrderCommand);
                 }else{
                     PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
+                            UUID.randomUUID().toString(),
                             OrderSource.WEB,
                             Location.CHARLOTTE,
                             loyaltyMemberId,
+                            Optional.of(
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-                            }},
+                            }}),
+                            Optional.of(
                             new ArrayList<LineItem>() {{
                                 add(new LineItem(Item.CAKEPOP, "John"));
-                            }});
+                            }}));
                     OrderEventResult orderEventResult = Order.process(placeOrderCommand);
-                    orderService.onPlaceOrderCommand(placeOrderCommand);
+                    orderService.onOrderIn(placeOrderCommand);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

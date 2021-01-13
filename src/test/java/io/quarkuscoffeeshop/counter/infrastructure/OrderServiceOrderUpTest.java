@@ -4,6 +4,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.quarkuscoffeeshop.counter.domain.*;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import io.quarkuscoffeeshop.counter.infrastructure.messaging.OrderUpdatesStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,10 +45,10 @@ public class OrderServiceOrderUpTest {
     public void testOnOrderUpdate() {
 
         LineItem lineItem = order.getBaristaLineItems().get().get(0);
-        OrderTicket orderTicket = new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName());
-        logger.info("Testing OrderTicket: {}", orderTicket);
+        TicketUp ticketUp = new TicketUp(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName(), "baristaName");
+        logger.info("Testing OrderTicket: {}", ticketUp);
 
-        orderService.onOrderUp(orderTicket);
+        orderService.onOrderUp(ticketUp);
         verify(orderRepository).persist(order);
         assertEquals(orderUpdatesStream.getOrderUpdates().size(), 1, "1 update should have been delivered to the 'order-updates' stream");
     }

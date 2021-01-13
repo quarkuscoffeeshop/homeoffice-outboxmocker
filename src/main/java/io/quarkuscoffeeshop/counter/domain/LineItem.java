@@ -1,13 +1,14 @@
 package io.quarkuscoffeeshop.counter.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@JsonIgnoreProperties(value = { "orderId" })
 @Entity
 @Table(name = "LineItems")
 public class LineItem extends PanacheEntityBase {

@@ -5,6 +5,8 @@ import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,12 +18,13 @@ public class LoyaltyMemberPurchaseEventTest {
     public void testLoyaltyMemberPurchaseEvent() {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
+                UUID.randomUUID().toString(),
                 OrderSource.COUNTER,
                 Location.RALEIGH,
                 "FawningFalcon",
-                new ArrayList<>() {{
-                    add(new LineItem(Item.ESPRESSO, "Dewwy"));
-                }},
+                Optional.of(new ArrayList() {{
+                    add(new LineItem(Item.COFFEE_BLACK, "Paul"));
+                }}),
                 null
         );
 

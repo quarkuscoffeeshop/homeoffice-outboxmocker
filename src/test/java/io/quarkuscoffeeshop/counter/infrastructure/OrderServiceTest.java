@@ -48,7 +48,7 @@ public class OrderServiceTest {
         PlaceOrderCommand placeOrderCommand = CommandMocker.placeOrderCommandSingleBlackCoffee();
 
         logger.info("Testing order with: {}", placeOrderCommand);
-        orderService.onPlaceOrderCommand(placeOrderCommand);
+        orderService.onOrderIn(placeOrderCommand);
         assertEquals(ticketStream.getObjects().size(), 1, "1 ticket should have been delivered to the 'barista' stream");
         logger.info("Ticket received {}", ticketStream.getObjects().get(0));
         OrderTicket orderTicket = ticketStream.getObjects().get(0);
@@ -61,7 +61,7 @@ public class OrderServiceTest {
         PlaceOrderCommand placeOrderCommand = CommandMocker.placeOrderCommandSingleCroissant();
 
         logger.info("Testing order with: {}", placeOrderCommand);
-        orderService.onPlaceOrderCommand(placeOrderCommand);
+        orderService.onOrderIn(placeOrderCommand);
         assertEquals(kitchenStream.getObjects().size(), 1, "1 ticket should have been delivered to the 'kitchen' stream");
         logger.info("Ticket received {}", kitchenStream.getObjects().get(0));
         OrderTicket orderTicket = kitchenStream.getObjects().get(0);
@@ -74,7 +74,7 @@ public class OrderServiceTest {
         PlaceOrderCommand placeOrderCommand = CommandMocker.placeOrderCommandBlackCoffeeAndCroissant();
 
         logger.info("Testing order with: {}", placeOrderCommand);
-        orderService.onPlaceOrderCommand(placeOrderCommand);
+        orderService.onOrderIn(placeOrderCommand);
         assertEquals(ticketStream.getObjects().size(), 1, "1 ticket should have been delivered to the 'barista' stream");
         logger.info("Ticket received {}", ticketStream.getObjects().get(0));
         OrderTicket baristaTicket = ticketStream.getObjects().get(0);

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,12 +24,13 @@ public class OrderTest {
   @Test
   public void testProcessPlaceOrderCommandWithSingleBaristaItem() {
     PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
+            UUID.randomUUID().toString(),
       OrderSource.WEB,
       Location.ATLANTA,
       null,
-      new ArrayList<>() {{
-        add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-      }},
+            Optional.of(new ArrayList() {{
+              add(new LineItem(Item.COFFEE_BLACK, "Paul"));
+            }}),
       null);
 
     OrderEventResult orderEventResult = Order.process(placeOrderCommand);
@@ -46,15 +48,16 @@ public class OrderTest {
   public void testProcessPlaceOrderCommandWithSingleBaristaItemAndSingleKitchenItem() {
 
     PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
+            UUID.randomUUID().toString(),
       OrderSource.WEB,
       Location.CHARLOTTE,
       null,
-      new ArrayList<>() {{
-        add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-      }},
-      new ArrayList<>() {{
-        add(new LineItem(Item.CAKEPOP, "John"));
-      }});
+            Optional.of(new ArrayList() {{
+              add(new LineItem(Item.COFFEE_BLACK, "Paul"));
+            }}),
+            Optional.of(new ArrayList() {{
+              add(new LineItem(Item.CROISSANT, "Paul"));
+            }}));
 
     OrderEventResult orderEventResult = Order.process(placeOrderCommand);
     logger.debug("OrderEventResult {}", orderEventResult.toString());

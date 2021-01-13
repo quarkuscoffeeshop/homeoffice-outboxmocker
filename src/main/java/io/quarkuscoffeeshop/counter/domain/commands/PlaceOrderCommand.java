@@ -1,5 +1,8 @@
 package io.quarkuscoffeeshop.counter.domain.commands;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.quarkuscoffeeshop.counter.domain.LineItem;
 import io.quarkuscoffeeshop.counter.domain.Location;
 import io.quarkuscoffeeshop.counter.domain.OrderSource;
@@ -10,34 +13,45 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+@RegisterForReflection
 public class PlaceOrderCommand {
 
   private final String id;
 
-  private OrderSource orderSource;
+  private final OrderSource orderSource;
 
-  private Location location;
+  private final Location location;
 
-  private String loyaltyMemberId;
+  private final String loyaltyMemberId;
 
-  private List<LineItem> baristaLineItems;
+  private final List<LineItem> baristaLineItems;
 
-  private List<LineItem> kitchenLineItems;
+  private final List<LineItem> kitchenLineItems;
 
   private final Instant timestamp;
 
-  public PlaceOrderCommand() {
-    this.id = UUID.randomUUID().toString();
-    this.timestamp = Instant.now();
-  }
-
-  public PlaceOrderCommand(OrderSource orderSource, Location location, String loyaltyMemberId, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {
-    this.id = UUID.randomUUID().toString();
+  @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+  public PlaceOrderCommand(
+          @JsonProperty("id") final String id,
+          @JsonProperty("orderSource") final OrderSource orderSource,
+          @JsonProperty("location") final Location location,
+          @JsonProperty("loyaltyMemberId") final String loyaltyMemberId,
+          @JsonProperty("baristaLineItems") Optional<List<LineItem>> baristaLineItems,
+          @JsonProperty("kitchenLineItems") Optional<List<LineItem>> kitchenLineItems) {
+    this.id = id;
     this.orderSource = orderSource;
     this.location = location;
     this.loyaltyMemberId = loyaltyMemberId;
-    this.baristaLineItems = baristaLineItems;
-    this.kitchenLineItems = kitchenLineItems;
+    if (baristaLineItems.isPresent()) {
+      this.baristaLineItems = baristaLineItems.get();
+    }else{
+      this.baristaLineItems = null;
+    }
+    if (kitchenLineItems.isPresent()) {
+      this.kitchenLineItems = kitchenLineItems.get();
+    }else{
+      this.kitchenLineItems = null;
+    }
     this.timestamp = Instant.now();
   }
 
@@ -71,32 +85,12 @@ public class PlaceOrderCommand {
     return Optional.ofNullable(baristaLineItems);
   }
 
-  public void setBaristaLineItems(List<LineItem> baristaLineItems) {
-    this.baristaLineItems = baristaLineItems;
-  }
-
   public Optional<List<LineItem>> getKitchenLineItems() {
     return Optional.ofNullable(kitchenLineItems);
   }
 
-  public void setKitchenLineItems(List<LineItem> kitchenLineItems) {
-    this.kitchenLineItems = kitchenLineItems;
-  }
-
   public Optional<String> getLoyaltyMemberId() {
     return Optional.ofNullable(loyaltyMemberId);
-  }
-
-  public Location getLocation() {
-    return location;
-  }
-
-  public void setLocation(Location location) {
-    this.location = location;
-  }
-
-  public void setLoyaltyMemberId(String loyaltyMemberId) {
-    this.loyaltyMemberId = loyaltyMemberId;
   }
 
   public String getId() {
@@ -107,8 +101,8 @@ public class PlaceOrderCommand {
     return orderSource;
   }
 
-  public void setOrderSource(OrderSource orderSource) {
-    this.orderSource = orderSource;
+  public Location getLocation() {
+    return location;
   }
 
   public Instant getTimestamp() {

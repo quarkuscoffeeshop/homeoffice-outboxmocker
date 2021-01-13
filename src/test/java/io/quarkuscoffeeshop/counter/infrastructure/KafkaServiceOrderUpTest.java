@@ -1,26 +1,27 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.quarkus.test.junit.mockito.InjectSpy;
-import io.quarkuscoffeeshop.counter.commands.CommandMocker;
+import io.quarkuscoffeeshop.counter.domain.Order;
 import io.quarkuscoffeeshop.counter.domain.OrderMocker;
 import io.quarkuscoffeeshop.counter.domain.OrderRepository;
-import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
+import io.smallrye.reactive.messaging.annotations.Merge;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import static org.mockito.ArgumentMatchers.any;
 
-@QuarkusTest @Transactional
-public class KafkaServiceTest {
+@QuarkusTest
+@Transactional
+public class KafkaServiceOrderUpTest {
 
     @InjectSpy
     OrderService orderService;
@@ -28,9 +29,8 @@ public class KafkaServiceTest {
     @InjectMock
     OrderRepository orderRepository;
 
-    @Inject
-    @Channel("orders-in")
-    Emitter<PlaceOrderCommand> ordersInEmitter;
+    @Channel("orders-up")
+    Emitter<TicketUp> ordersUpEmitter;
 
     @BeforeEach
     public void setUp() {
@@ -39,10 +39,10 @@ public class KafkaServiceTest {
     }
 
     @Test
-    public void testOrderIn() {
+    public void testOrderUp() {
 
-//        ordersInEmitter.send(CommandMocker.placeOrderCommandSingleBlackCoffee());
-        Mockito.verify(orderService, Mockito.times(1)).onOrderIn(any(PlaceOrderCommand.class));
+        TicketUp ticketUp = new TicketUp(OrderMocker.mockOrder().getOrderId(), OrderMocker.mockOrder().getBaristaLineItems().get().get(0).getItemId(), OrderMocker.mockOrder().getBaristaLineItems().get().get(0).getItem(), OrderMocker.mockOrder().getBaristaLineItems().get().get(0).getName(), "baristaName");
+        ordersUpEmitter.send(ticketUp);
+        Mockito.verify(orderService, Mockito.times(1)).onOrderUp(any(TicketUp.class));
     }
-
 }

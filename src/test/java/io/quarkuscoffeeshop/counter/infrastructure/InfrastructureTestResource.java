@@ -12,16 +12,20 @@ import java.util.Map;
  */
 public class InfrastructureTestResource implements QuarkusTestResourceLifecycleManager {
 
-    final KafkaContainer KAFKA = new KafkaContainer();
-    final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>();
+    private KafkaContainer kafkaContainer;
+//    private PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>();
 
     @Override
     public Map<String, String> start() {
-        KAFKA.start();
-        System.setProperty("KAFKA_BOOTSTRAP_URLS", KAFKA.getBootstrapServers());
+        kafkaContainer = new KafkaContainer("confluentinc/cp-kafka:5.4.3");
+        kafkaContainer.start();
+        System.setProperty("KAFKA_BOOTSTRAP_URLS", kafkaContainer.getBootstrapServers());
 
-        POSTGRES.withInitScript("postgresql-init.sql");
-        System.setProperty("POSTGRES_JDBC_URL", POSTGRES.getJdbcUrl());
+/*
+        postgreSQLContainer = new PostgreSQLContainer<>();
+        postgreSQLContainer.withInitScript("postgresql-init.sql");
+        System.setProperty("POSTGRES_JDBC_URL", postgreSQLContainer.getJdbcUrl());
+*/
         return Collections.emptyMap();
     }
 
@@ -29,7 +33,7 @@ public class InfrastructureTestResource implements QuarkusTestResourceLifecycleM
     public void stop() {
         System.clearProperty("KAFKA_BOOTSTRAP_URLS");
         System.clearProperty("POSTGRES_JDBC_URL");
-        KAFKA.close();
-        POSTGRES.close();
+        kafkaContainer.close();
+//        postgreSQLContainer.close();
     }
 }

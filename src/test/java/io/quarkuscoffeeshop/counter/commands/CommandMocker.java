@@ -7,6 +7,8 @@ import io.quarkuscoffeeshop.counter.domain.OrderSource;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.UUID;
 
 public class CommandMocker {
 
@@ -18,12 +20,13 @@ public class CommandMocker {
      */
     public static PlaceOrderCommand placeOrderCommandSingleBlackCoffee() {
         return new PlaceOrderCommand(
+                UUID.randomUUID().toString(),
                 OrderSource.WEB,
                 Location.ATLANTA,
                 null,
-                new ArrayList<>() {{
+                Optional.of(new ArrayList() {{
                     add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-                }},
+                }}),
                 null);
     }
 
@@ -35,26 +38,28 @@ public class CommandMocker {
      */
     public static PlaceOrderCommand placeOrderCommandSingleCroissant() {
         return new PlaceOrderCommand(
+                UUID.randomUUID().toString(),
                 OrderSource.WEB,
                 Location.ATLANTA,
                 null,
                 null,
-                new ArrayList<>() {{
-                    add(new LineItem(Item.CROISSANT, "John"));
-                }});
+                Optional.of(new ArrayList() {{
+                    add(new LineItem(Item.CROISSANT, "Paul"));
+                }}));
     }
 
     public static PlaceOrderCommand placeOrderCommandBlackCoffeeAndCroissant() {
         return new PlaceOrderCommand(
+                UUID.randomUUID().toString(),
                 OrderSource.WEB,
                 Location.ATLANTA,
                 null,
-                new ArrayList<>() {{
+                Optional.of(new ArrayList() {{
                     add(new LineItem(Item.COFFEE_BLACK, "Paul"));
-                }},
-                new ArrayList<>() {{
-                    add(new LineItem(Item.CROISSANT, "John"));
-                }});
+                }}),
+                Optional.of(new ArrayList() {{
+                    add(new LineItem(Item.CROISSANT, "Paul"));
+                }}));
     }
 
 }

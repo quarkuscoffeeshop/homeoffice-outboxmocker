@@ -138,6 +138,7 @@ public class Order extends PanacheEntityBase {
         LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);
         order.addBaristaLineItem(lineItem);
         orderEventResult.addBaristaTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
+        orderEventResult.addUpdate(new OrderUpdate(lineItem.getOrder().getOrderId(), lineItem.getItemId(), OrderStatus.IN_PROGRESS));
       });
     }
     if (placeOrderCommand.getKitchenLineItems().isPresent()) {
@@ -147,6 +148,7 @@ public class Order extends PanacheEntityBase {
         LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);
         order.addKitchenLineItem(lineItem);
         orderEventResult.addKitchenTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
+        orderEventResult.addUpdate(new OrderUpdate(lineItem.getOrder().getOrderId(), lineItem.getItemId(), OrderStatus.IN_PROGRESS));
       });
     }
 
