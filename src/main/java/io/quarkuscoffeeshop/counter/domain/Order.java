@@ -102,7 +102,7 @@ public class Order extends PanacheEntityBase {
     OrderUpdatedEvent orderUpdatedEvent = OrderUpdatedEvent.of(this);
 
     // create the update value object
-    OrderUpdate orderUpdate = new OrderUpdate(ticketUp.getOrderId(), ticketUp.getLineItemId(), OrderStatus.FULFILLED);
+    OrderUpdate orderUpdate = new OrderUpdate(ticketUp.getOrderId(), ticketUp.getLineItemId(), ticketUp.getName(), ticketUp.getItem(), OrderStatus.FULFILLED, ticketUp.madeBy);
 
     OrderEventResult orderEventResult = new OrderEventResult();
     orderEventResult.setOrder(this);
@@ -138,7 +138,7 @@ public class Order extends PanacheEntityBase {
         LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);
         order.addBaristaLineItem(lineItem);
         orderEventResult.addBaristaTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
-        orderEventResult.addUpdate(new OrderUpdate(lineItem.getOrder().getOrderId(), lineItem.getItemId(), OrderStatus.IN_PROGRESS));
+        orderEventResult.addUpdate(new OrderUpdate(lineItem.getOrder().getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
       });
     }
     if (placeOrderCommand.getKitchenLineItems().isPresent()) {
@@ -148,7 +148,7 @@ public class Order extends PanacheEntityBase {
         LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);
         order.addKitchenLineItem(lineItem);
         orderEventResult.addKitchenTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
-        orderEventResult.addUpdate(new OrderUpdate(lineItem.getOrder().getOrderId(), lineItem.getItemId(), OrderStatus.IN_PROGRESS));
+        orderEventResult.addUpdate(new OrderUpdate(lineItem.getOrder().getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
       });
     }
 

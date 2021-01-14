@@ -69,6 +69,8 @@ public class JsonResource {
         OrderUpdate orderUpdate = new OrderUpdate(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                "Cat",
+                Item.CAKEPOP,
                 OrderStatus.FULFILLED
         );
 
