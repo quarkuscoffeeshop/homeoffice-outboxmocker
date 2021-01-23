@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Entity @Table(name = "Orders")
+@Entity @Table(name = "outbox_orders")
 public class Order extends PanacheEntityBase {
 
     @Transient

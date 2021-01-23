@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 @Entity
-@Table(name="LineItems")
+@Table(name="outbox_lineitems")
 public class LineItem extends PanacheEntity {
 
     @Enumerated(EnumType.STRING)
@@ -40,7 +40,7 @@ public class LineItem extends PanacheEntity {
         return new StringJoiner(", ", LineItem.class.getSimpleName() + "[", "]")
                 .add("item=" + item)
                 .add("name='" + name + "'")
-                .add("orderId='" + order.getOrderId() +"'")
+//                .add("orderId='" + order.getOrderId() +"'")
                 .toString();
     }
 
