@@ -40,7 +40,6 @@ public class LineItem extends PanacheEntity {
         return new StringJoiner(", ", LineItem.class.getSimpleName() + "[", "]")
                 .add("item=" + item)
                 .add("name='" + name + "'")
-                .add("orderId='" + order.getOrderId() +"'")
                 .toString();
     }
 
