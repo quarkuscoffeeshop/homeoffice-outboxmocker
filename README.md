@@ -1,3 +1,6 @@
+# Docs
+Please see the Github Pages Site for complete documentation: [quarkuscoffeeshop.github.io](https://quarkuscoffeeshop.github.io)
+
 # Outboxmocker project
 
 This project creates and persists Orders and the corresponding events for use in developing the Debezium Outbox pattern
